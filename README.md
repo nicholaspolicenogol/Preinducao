@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Pré-indução de hangar</title>
+<title>Pré-indução: painel gerencial</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@500;600;700&display=swap" rel="stylesheet">
@@ -219,217 +219,135 @@ tr.click:hover td{background:var(--surface-2)}
 }
 .tl-scale span:first-child{transform:none;text-align:left}
 .tl-scale span:last-child{transform:translateX(-100%);text-align:right}
+
+/* ===== painel gerencial ===== */
+.kcards{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;margin-top:16px}
+.kcard{background:var(--surface);border:1px solid var(--line);border-top:4px solid var(--line);border-radius:8px;padding:12px 14px 12px;min-width:0}
+.kcard.good{border-top-color:var(--disp)} .kcard.warn{border-top-color:var(--atende)} .kcard.bad{border-top-color:var(--nao)}
+.kcard h4{margin:0;font-size:13.5px;font-weight:600;line-height:1.25}
+.kcard .v{font-family:var(--cond);font-size:36px;font-weight:700;line-height:1.05;margin-top:6px}
+.kcard.good .v{color:var(--disp)} .kcard.warn .v{color:var(--atende)} .kcard.bad .v{color:var(--nao)}
+.kcard .meta{font-size:12.5px;color:var(--muted);margin-top:2px}
+.kcard .delta{font-size:12.5px;margin-top:6px;font-weight:600}
+.kcard .delta.up{color:var(--disp)} .kcard .delta.down{color:var(--nao)} .kcard .delta.eq{color:var(--muted)}
+.kcard .ctx{font-size:12.5px;color:var(--muted);margin-top:6px;line-height:1.35}
+.actions-list{display:flex;flex-direction:column}
+.act{display:grid;grid-template-columns:6px minmax(0,1fr) auto;gap:12px;padding:10px 0;border-top:1px solid var(--line);align-items:start}
+.act:first-child{border-top:0}
+.act .sev{align-self:stretch;border-radius:3px;background:var(--atende)}
+.act.alta .sev{background:var(--nao)}
+.act b{display:block;font-size:14.5px;line-height:1.3}
+.act span.d{display:block;color:var(--muted);font-size:13px;margin-top:2px;line-height:1.35}
+.act .area{font-size:12px;font-weight:600;border:1px solid var(--line);border-radius:10px;padding:1px 8px;white-space:nowrap;color:var(--ink)}
+.act-filter{display:flex;gap:6px;flex-wrap:wrap;margin:-2px 0 10px}
+.chip{border:1px solid var(--line);background:var(--surface);border-radius:14px;padding:3px 10px;font-size:12.5px;cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.chart{width:100%;display:block}
+.chart text{fill:var(--muted);font-family:var(--font);font-size:11px}
+.chart .lbl{fill:var(--ink);font-weight:600}
+.chart .meta-line{stroke:var(--navy);stroke-dasharray:4 3;stroke-width:1.5}
+.chart .grid{stroke:var(--line)}
+.reg{font-size:12px;font-weight:600}
+.reg.Regular{color:var(--nao)} .reg.Irregular{color:var(--atende)}
+.who{font-size:12.5px;color:var(--muted)}
+.upload-hint{font-size:13px;color:var(--muted)}
+@media (max-width:1100px){ .kcards{grid-template-columns:repeat(3,minmax(0,1fr))} }
+@media (max-width:640px){ .kcards{grid-template-columns:repeat(2,minmax(0,1fr))} .kcard .v{font-size:30px} }
+.badge{display:inline-block;font-size:12px;font-weight:600;padding:3px 9px;border-radius:10px;border:1px solid var(--line);color:var(--muted)}
+.badge.cloud{border-color:var(--disp);color:var(--disp)}
+.badge:empty{display:none}
 </style>
 </head>
 <body>
 <div class="wrap">
   <header class="top">
     <div>
-      <h1>Pré-indução de hangar</h1>
-      <div class="sub" id="subInfo">Planejamento de Suprimentos</div>
+      <h1>Pré-indução: painel gerencial</h1>
+      <div class="sub" id="subInfo">Nenhuma planilha carregada ainda</div>
     </div>
     <div class="actions">
+      <span class="badge" id="storeBadge"></span>
       <button class="btn" id="themeBtn" type="button">Tema</button>
-      <div class="menu">
-        <button class="btn" id="menuBtn" type="button" aria-haspopup="true" aria-expanded="false">Histórico</button>
-        <div class="menu-list hidden" id="menuList" role="menu">
-          <button type="button" role="menuitem" id="exportBtn">Baixar cópia do histórico</button>
-          <button type="button" role="menuitem" id="importBtn">Restaurar histórico de um arquivo</button>
-          <button type="button" role="menuitem" id="clearBtn">Apagar dados deste navegador</button>
-        </div>
-      </div>
-      <button class="btn primary" id="loadBtn" type="button">Carregar planilhas</button>
-      <input type="file" id="fileInput" accept=".xlsx,.xlsm" multiple class="hidden">
-      <input type="file" id="importInput" accept=".json" class="hidden">
+      <button class="btn primary" id="loadBtn" type="button">Atualizar com a planilha da semana</button>
+      <input type="file" id="fileInput" accept=".xlsx,.xlsm" class="hidden">
     </div>
   </header>
+  <div class="tabs" style="height:0;border-bottom-width:2px"></div>
+  <div class="banner hidden" id="newBanner">Outra pessoa atualizou o painel. <button class="btn small" id="reloadBtn" type="button">Ver a versão nova</button></div>
+  <div class="banner hidden" id="localBanner">Este painel está aberto fora do Claude: os dados ficam só neste navegador. Para a gerência ver a mesma versão, use o link publicado no Claude.</div>
 
-  <nav class="tabs" aria-label="Seções">
-    <a href="#visao" data-tab="visao">Visão geral</a>
-    <a href="#preinducao" data-tab="preinducao">Pré-indução</a>
-    <a href="#pedidos" data-tab="pedidos">Pedidos e backorders</a>
-    <a href="#estoque" data-tab="estoque">Posição de estoque</a>
-  </nav>
-
-  <section class="sources" aria-label="Planilhas carregadas">
-    <div class="src" id="srcPre"><i class="dot"></i><div><b>Planilha de pré-indução</b><span id="srcPreTxt">Ainda não carregada</span></div></div>
-    <div class="src" id="srcEst"><i class="dot"></i><div><b>Posição de estoque</b><span id="srcEstTxt">Ainda não carregada (opcional)</span></div></div>
-  </section>
-  <div class="banner">O histórico fica salvo neste navegador. Para não perder nada ao trocar de computador, use <b>Histórico › Baixar cópia do histórico</b> de vez em quando.</div>
-
-  <section id="empty" class="drop" tabindex="0" aria-label="Área para soltar as planilhas">
-    <h2>Arraste as planilhas para cá</h2>
-    <p>Solte a planilha de pré-indução (aba Caminho Crítico) e, se quiser, a Posição de estoque diária. Pode soltar as duas juntas: o painel reconhece cada uma sozinho.</p>
-    <p>Tudo é processado no seu navegador; nenhum dado é enviado para a internet.</p>
-    <div class="msg" id="emptyMsg"></div>
+  <section id="empty" class="drop" tabindex="0" aria-label="Área para soltar a planilha">
+    <h2>Solte aqui a planilha de pré-indução da semana</h2>
+    <p>O painel lê as abas Caminho Crítico, Base_evolutivo, Regularidade e 1328 AMOS e calcula os indicadores gerenciais. A planilha é grande: a leitura pode levar até 1 minuto.</p>
+    <p class="msg" id="emptyMsg"></p>
   </section>
 
   <main id="dash" class="hidden">
-    <section class="filters" aria-label="Filtros gerais">
-      <label>Aeronave / evento<select id="fEvento"></select></label>
-      <label>Responsável<select id="fResp"></select></label>
-      <label>Atividade<select id="fAtiv"></select></label>
-      <label>Buscar PN, descrição, WO ou pedido<input id="fBusca" type="search" placeholder="Ex.: SEALANT, 4500403728"></label>
-      <button class="btn" id="resetBtn" type="button">Limpar filtros</button>
-    </section>
+    <section class="kcards" id="kcards" aria-label="Indicadores"></section>
 
-    <!-- VISÃO GERAL -->
-    <section data-view="visao">
-      <div class="kpis" id="kVisao"></div>
-      <div class="grid21">
-        <section class="panel">
-          <h3>Linha do tempo das induções</h3>
-          <p class="hint">Cada aeronave aparece na distância em dias até a entrada no hangar. Dentro da faixa azul (T-60) a meta é ter 100% do material atendido.</p>
-          <div class="tl-legend">
-            <span><i style="background:var(--disp)"></i>100% atendido</span>
-            <span><i style="background:var(--atende)"></i>Com pendências, fora da meta</span>
-            <span><i style="background:var(--nao)"></i>Com pendências dentro de T-60</span>
-            <span><i class="z"></i>Zona da meta (T-60)</span>
-          </div>
-          <div class="tl" id="timeline"></div>
-        </section>
-        <div style="display:flex;flex-direction:column;gap:18px;min-width:0">
-          <section class="panel">
-            <h3>Fora da meta</h3>
-            <p class="hint">Aeronaves a 60 dias ou menos da indução com linhas que não atendem.</p>
-            <div class="alerts" id="alerts"></div>
-          </section>
-          <section class="panel">
-            <h3>Evolução das cargas</h3>
-            <div class="trend-legend"><span><i style="background:var(--disp)"></i>% atendido</span><span><i style="background:var(--nao)"></i>Linhas que não atendem</span></div>
-            <svg class="trend" id="trend" viewBox="0 0 400 150" preserveAspectRatio="none" role="img" aria-label="Evolução das cargas"></svg>
-            <p class="hint" id="trendNote" style="margin:0"></p>
-          </section>
-        </div>
-      </div>
-      <div class="grid2">
-        <section class="panel">
-          <h3>Top 10 itens críticos</h3>
-          <p class="hint">PNs com mais linhas que não atendem nas próximas induções.</p>
-          <div id="topPn"></div>
-        </section>
-        <section class="panel">
-          <h3>Top 10 aeronaves com pendências</h3>
-          <p class="hint">Linhas que não atendem por aeronave. Clique para filtrar.</p>
-          <div class="hbars" id="topAcft"></div>
-        </section>
-      </div>
-      <div class="grid2">
-        <section class="panel">
-          <h3>Quem precisa agir</h3>
-          <p class="hint">Linhas que não atendem por área responsável.</p>
-          <div class="hbars" id="byResp"></div>
-        </section>
-        <section class="panel">
-          <h3>Situação da previsão</h3>
-          <p class="hint">Como cada linha ativa está sendo atendida.</p>
-          <div class="hbars" id="byPrev"></div>
-        </section>
-      </div>
-    </section>
-
-    <!-- PRÉ-INDUÇÃO -->
-    <section data-view="preinducao" class="hidden">
-      <div class="kpis" id="kPre"></div>
-      <section class="panel full">
+    <div class="grid2">
+      <section class="panel">
         <div class="panel-head">
-          <div><h3>Linhas de demanda</h3><p class="hint" id="preCount"></p></div>
-          <div class="filters">
-            <label>Status<select id="fStatus">
-              <option value="n">Não atende</option>
-              <option value="a">Chega a tempo</option>
-              <option value="d">Disponível</option>
-              <option value="ativas">Todas as ativas</option>
-              <option value="gone">Saíram da planilha</option>
-            </select></label>
-            <label>Marco<select id="fMarco"></select></label>
-            <label>Na última carga<select id="fMud">
-              <option value="">Todas as linhas</option>
-              <option value="mudou">Mudaram de status</option>
-              <option value="nova">Entraram agora</option>
-            </select></label>
-            <button class="btn" type="button" data-csv="tPre">Exportar CSV</button>
-          </div>
+          <div><h3>Pontos de ação</h3><p class="hint">Gerados a partir da planilha: o que precisa de decisão ou cobrança agora.</p></div>
         </div>
-        <div id="tPre"></div>
+        <div class="act-filter" id="actFilter"></div>
+        <div class="actions-list" id="actions"></div>
       </section>
-    </section>
+      <section class="panel">
+        <h3>Próximas induções</h3>
+        <p class="hint">Posição de cada aeronave até a entrada no hangar. Faixa azul: zona da meta (T-60).</p>
+        <div class="tl-legend">
+          <span><i style="background:var(--disp)"></i>100% atendido</span>
+          <span><i style="background:var(--atende)"></i>Pendente, fora da meta</span>
+          <span><i style="background:var(--nao)"></i>Pendente dentro de T-60</span>
+        </div>
+        <div class="tl" id="timeline"></div>
+      </section>
+    </div>
 
-    <!-- PEDIDOS -->
-    <section data-view="pedidos" class="hidden">
-      <div class="kpis" id="kPed"></div>
-      <div class="grid2">
-        <section class="panel">
-          <h3>Chegadas previstas por semana</h3>
-          <p class="hint">Linhas com pedido e previsão de chegada nas próximas 8 semanas.</p>
-          <div class="cols" id="weeks"></div>
-        </section>
-        <section class="panel">
-          <h3>Top 10 pedidos em backorder</h3>
-          <p class="hint">Pedidos atrasados ou sem previsão que travam mais linhas.</p>
-          <div id="topPed"></div>
-        </section>
-      </div>
-      <section class="panel full">
-        <div class="panel-head">
-          <div><h3>Linhas com pedido</h3><p class="hint" id="pedCount"></p></div>
-          <div class="filters">
-            <label>Situação<select id="fSit">
-              <option value="back">Backorder (atrasado ou sem previsão)</option>
-              <option value="atrasado">Atrasado</option>
-              <option value="sem">Sem previsão</option>
-              <option value="prazo">No prazo</option>
-              <option value="">Todos</option>
-            </select></label>
-            <label>Tipo de pedido<select id="fTipo">
-              <option value="">Todos</option>
-              <option value="PO de compra">PO de compra</option>
-              <option value="Requisição (RC)">Requisição (RC)</option>
-              <option value="Reparo (RO)">Reparo (RO)</option>
-              <option value="Produção (MP)">Produção (MP)</option>
-              <option value="Outro">Outro</option>
-            </select></label>
-            <button class="btn" type="button" data-csv="tPed">Exportar CSV</button>
-          </div>
-        </div>
-        <div id="tPed"></div>
+    <div class="grid2">
+      <section class="panel">
+        <h3>Disponibilidade na indução, mês a mês</h3>
+        <p class="hint">Média do % de material disponível na última atualização antes de cada indução (Base_evolutivo). Linha tracejada: meta de 98%.</p>
+        <svg class="chart" id="chMes" viewBox="0 0 600 220" role="img" aria-label="Disponibilidade na indução por mês"></svg>
       </section>
-      <section class="panel full">
-        <h3>Não atendem sem pedido</h3>
-        <p class="hint">Linhas que não atendem e ainda não têm PO, requisição, reparo ou ordem de produção.</p>
-        <div class="panel-head" style="justify-content:flex-end"><button class="btn small" type="button" data-csv="tSemPed">Exportar CSV</button></div>
-        <div id="tSemPed" style="margin-top:8px"></div>
+      <section class="panel">
+        <h3>Aderência ao T-60, por trimestre</h3>
+        <p class="hint">% das aeronaves que chegaram ao T-60 com 100% da demanda atendida.</p>
+        <svg class="chart" id="chT60" viewBox="0 0 600 220" role="img" aria-label="Aderência ao T-60 por trimestre"></svg>
       </section>
-    </section>
+    </div>
 
-    <!-- ESTOQUE -->
-    <section data-view="estoque" class="hidden">
-      <div id="estEmpty" class="drop" tabindex="0">
-        <h2>Carregue a Posição de estoque</h2>
-        <p>Solte aqui o arquivo Posição de estoque.xlsx (o mesmo que a automação salva na pasta Relatórios automatizados). O painel cruza o estoque de todas as bases com as linhas que não atendem.</p>
-      </div>
-      <div id="estDash" class="hidden">
-        <div class="kpis" id="kEst"></div>
-        <div class="grid2">
-          <section class="panel">
-            <h3>Registros por base</h3>
-            <p class="hint">As 12 bases com mais registros na posição de estoque.</p>
-            <div class="hbars" id="byStation"></div>
-          </section>
-          <section class="panel">
-            <h3>Consultar PN</h3>
-            <div class="filters" style="margin-top:6px"><label>Part number<input id="pnQuery" type="search" placeholder="Digite o PN exato"></label></div>
-            <div id="pnResult" style="margin-top:12px"></div>
-          </section>
-        </div>
-        <section class="panel full">
-          <div class="panel-head">
-            <div><h3>Oportunidades de transferência</h3><p class="hint" id="oppCount">Linhas que não atendem, mas o PN tem estoque em alguma base.</p></div>
-            <button class="btn" type="button" data-csv="tOpp">Exportar CSV</button>
-          </div>
-          <div id="tOpp"></div>
-        </section>
-      </div>
+    <div class="grid2">
+      <section class="panel">
+        <h3>Gargalos por área</h3>
+        <p class="hint">Linhas que não atendem e há quantos dias, em média, estão pendentes.</p>
+        <div id="resp"></div>
+      </section>
+      <section class="panel">
+        <h3>Pedidos que mais travam induções</h3>
+        <p class="hint">Pedidos atrasados ou sem previsão, pelo número de linhas afetadas.</p>
+        <div id="orders"></div>
+      </section>
+    </div>
+
+    <div class="grid2">
+      <section class="panel">
+        <h3>Itens críticos e perfil de consumo</h3>
+        <p class="hint">PNs que mais faltam, com a classificação da aba Regularidade. Item regular que falta com frequência indica estoque mínimo a revisar.</p>
+        <div id="pns"></div>
+      </section>
+      <section class="panel">
+        <h3>Fornecedores com itens vencidos</h3>
+        <p class="hint">Itens abertos de pedidos da pré-indução com data confirmada ou target vencida (1328 AMOS).</p>
+        <div class="hbars" id="vend"></div>
+      </section>
+    </div>
+
+    <section class="panel full">
+      <h3>Últimas induções</h3>
+      <p class="hint">Disponibilidade de material registrada na véspera de cada entrada no hangar.</p>
+      <div id="inducoes"></div>
     </section>
 
     <p class="note" id="note"></p>
@@ -438,61 +356,40 @@ tr.click:hover td{background:var(--surface-2)}
 
 <div class="overlay" id="overlay" role="status" aria-live="polite"><div id="overlayMsg">Lendo planilha…</div></div>
 
-<div class="modal" id="confirm" role="dialog" aria-modal="true" aria-labelledby="cfTitle">
-  <div class="box">
-    <h3 id="cfTitle">Salvar a carga de hoje?</h3>
-    <p id="cfFile"></p>
-    <dl id="cfStats"></dl>
-    <p>Linhas que saíram da planilha não são apagadas: ficam guardadas com a data em que saíram.</p>
-    <div class="row">
-      <button class="btn" id="cfCancel" type="button">Cancelar</button>
-      <button class="btn primary" id="cfSave" type="button">Salvar carga</button>
-    </div>
-  </div>
-</div>
-
 <script>
 (function(){
 "use strict";
-var SHEET = "Caminho Crítico", DAY = 86400000, DB = "preinducao-v2";
+var DAY = 86400000;
 var $ = function(id){ return document.getElementById(id); };
-var S = { rows: [], cargas: [], meta: null, stock: null, events: [], tab: "visao" };
-var pending = null, queue = [];
+var S = { snap: null, resumos: [], pend: {}, snapId: null, actArea: "" };
+var store = null;
 
 /* ================= utilidades ================= */
 function norm(s){ return String(s == null ? "" : s).normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/\s+/g," ").trim().toLowerCase(); }
 function str(v){ return v == null ? "" : String(v).trim(); }
+function upn(v){ return str(v).toUpperCase(); }
 function isSerial(v){ return typeof v === "number" && v > 30000 && v < 80000; }
 function toDay(v){ return isSerial(v) ? Math.floor(v) - 25569 : null; }
 function today(){ var n = new Date(); return Math.floor(Date.UTC(n.getFullYear(), n.getMonth(), n.getDate()) / DAY); }
-function fd(d, short){
-  if (d == null) return "";
-  var x = new Date(d * DAY), dd = String(x.getUTCDate()).padStart(2,"0"), mm = String(x.getUTCMonth()+1).padStart(2,"0");
-  return short ? dd + "/" + mm : dd + "/" + mm + "/" + x.getUTCFullYear();
-}
+function fd(d, short){ if (d == null) return ""; var x = new Date(d * DAY), dd = String(x.getUTCDate()).padStart(2,"0"), mm = String(x.getUTCMonth()+1).padStart(2,"0"); return short ? dd + "/" + mm : dd + "/" + mm + "/" + x.getUTCFullYear(); }
+var MES = ["jan","fev","mar","abr","mai","jun","jul","ago","set","out","nov","dez"];
+function monthKey(d){ var x = new Date(d * DAY); return x.getUTCFullYear() + "-" + String(x.getUTCMonth()+1).padStart(2,"0"); }
+function monthLbl(k){ var p = k.split("-"); return MES[parseInt(p[1],10)-1] + "/" + p[0].slice(2); }
+function quarterKey(d){ var x = new Date(d * DAY); return x.getUTCFullYear() + "T" + (Math.floor(x.getUTCMonth()/3)+1); }
 function pct(a,b){ return b ? a/b*100 : 0; }
-function fp(a,b){ return b ? pct(a,b).toLocaleString("pt-BR",{minimumFractionDigits:1,maximumFractionDigits:1}) + "%" : "–"; }
+function f1(v){ return v == null ? "–" : v.toLocaleString("pt-BR",{minimumFractionDigits:1,maximumFractionDigits:1}); }
 function fi(n){ return Number(n || 0).toLocaleString("pt-BR"); }
 function esc(s){ return String(s == null ? "" : s).replace(/[&<>"]/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c]; }); }
 function pl(n, a, b){ return fi(n) + " " + (n === 1 ? a : b); }
-function upn(s){ return str(s).toUpperCase(); }
 function statusOf(v){ var s = norm(v); if (s.charAt(0) === "1" || s.indexOf("disponivel") >= 0) return "d"; if (s.charAt(0) === "2" || s === "atende") return "a"; return "n"; }
-var ST_CLS = { d: "disp", a: "atende", n: "nao" };
-var ST_LBL = { d: "Disponível", a: "Chega a tempo", n: "Não atende" };
-var ST_SHORT = { d: "Disp.", a: "Chega", n: "Não at." };
-function marcoOrder(m){ var x = /^T(\d+)$/i.exec(m || ""); return x ? -parseInt(x[1],10) : 1; }
 function prevTipo(raw){
   if (isSerial(raw)) return "data";
   var s = norm(raw);
-  if (!s) return "sem";
+  if (!s || s.indexOf("sem previs") >= 0) return "sem";
   if (s.indexOf("transferir") >= 0) return "transferir";
-  if (s.indexOf("sem previs") >= 0) return "sem";
   if (s.indexOf("estoque") === 0) return "estoque";
-  if (s.indexOf("mro") >= 0) return "mro";
-  if (s.indexOf("paliativo") >= 0) return "paliativo";
   return "outro";
 }
-var PREV_LBL = { estoque: "Em estoque", transferir: "Estoque a transferir", data: "Com data prevista", sem: "Sem previsão", mro: "MRO", paliativo: "Paliativo", outro: "Outros" };
 function tipoPedido(order, ext){
   var o = upn(order), x = str(ext);
   if (!o) return "";
@@ -502,617 +399,438 @@ function tipoPedido(order, ext){
   if (/^R/.test(o)) return "Reparo (RO)";
   return "Outro";
 }
-function marcoAtual(days){
-  if (days == null) return "";
-  if (days < 0) return "Em execução";
-  if (days <= 7) return "T-7";
-  if (days <= 45) return "T-45";
-  if (days <= 60) return "T-60";
-  if (days <= 120) return "T-120";
-  return "T-180";
-}
-function sleep(ms){ return new Promise(function(r){ setTimeout(r, ms); }); }
-
-/* ================= leitura: pré-indução ================= */
-var COLS = {
-  prog: ["programacao"], marco: ["demanda"], wo: ["wo"], acft: ["acft"], pn: ["pn"], desc: ["description","descricao"],
-  qty: ["qty","quantidade"], nec: ["data necessidade"], prev: ["previsao na cia"], atend: ["atendimento"],
-  resp: ["responsavel"], obs: ["observacoes"], order: ["order no. (oh_orderno)"], ext: ["ext. order (oh_ext_orderno)"],
-  pacote: ["pacote"], ativ: ["atividade"], acao: ["acao confirmed"]
-};
-function findCol(head, names, prefix){
-  var idx = -1;
-  names.some(function(n){ idx = head.indexOf(n); return idx >= 0; });
-  if (idx < 0 && prefix) idx = head.findIndex(function(h){ return h.indexOf(prefix) === 0; });
-  return idx;
-}
-function parsePre(ws){
-  var aoa = XLSX.utils.sheet_to_json(ws, { header: 1, raw: true, defval: null, blankrows: false });
-  var h = -1;
-  for (var i = 0; i < Math.min(15, aoa.length); i++) { var hs = (aoa[i] || []).map(norm); if (hs.indexOf("atendimento") >= 0 && hs.indexOf("pacote") >= 0) { h = i; break; } }
-  if (h < 0) throw new Error("Não encontrei o cabeçalho da aba “" + SHEET + "” (colunas Atendimento e Pacote).");
-  var head = aoa[h].map(norm), m = {};
-  Object.keys(COLS).forEach(function(k){
-    m[k] = findCol(head, COLS[k], k === "order" ? "order no" : k === "ext" ? "ext. order" : null);
-  });
-  ["pacote","wo","pn","atend"].forEach(function(k){ if (m[k] < 0) throw new Error("Coluna obrigatória não encontrada: " + COLS[k][0]); });
-  var out = [], seen = {};
-  for (var r = h + 1; r < aoa.length; r++) {
-    var a = aoa[r]; if (!a) continue;
-    var g = function(k){ return m[k] >= 0 ? a[m[k]] : null; };
-    if (g("pn") == null && g("pacote") == null) continue;
-    var prev = g("prev"), order = str(g("order"));
-    var row = {
-      pacote: str(g("pacote")), acft: str(g("acft")), wo: str(g("wo")), pn: str(g("pn")), desc: str(g("desc")),
-      qty: typeof g("qty") === "number" ? g("qty") : str(g("qty")), nec: toDay(g("nec")), prog: toDay(g("prog")),
-      marco: str(g("marco")) || "Sem marco", prevDay: toDay(prev), prevTxt: isSerial(prev) ? "" : str(prev), prevTipo: prevTipo(prev),
-      st: statusOf(g("atend")), resp: str(g("resp")) || "Sem responsável", obs: str(g("obs")).slice(0, 300),
-      order: order, ext: str(g("ext")), tipo: tipoPedido(order, g("ext")), ativ: str(g("ativ")).replace(/^[:\s]+/, ""), acao: str(g("acao"))
-    };
-    var base = row.pacote + "|" + row.wo + "|" + row.pn;
-    seen[base] = (seen[base] || 0) + 1;
-    row.k = seen[base] > 1 ? base + "#" + seen[base] : base;
-    out.push(row);
+function marcoAtual(days){ if (days == null) return ""; if (days < 0) return "em execução"; if (days <= 7) return "T-7"; if (days <= 45) return "T-45"; if (days <= 60) return "T-60"; if (days <= 120) return "T-120"; return "T-180"; }
+function header(aoa, must, maxRows){
+  for (var i = 0; i < Math.min(maxRows || 15, aoa.length); i++) {
+    var hs = (aoa[i] || []).map(norm);
+    if (must.every(function(m){ return hs.indexOf(m) >= 0; })) return { row: i, head: hs };
   }
-  if (!out.length) throw new Error("A aba “" + SHEET + "” está vazia.");
+  return null;
+}
+function col(head, names){ for (var i = 0; i < names.length; i++) { var j = head.indexOf(names[i]); if (j >= 0) return j; } return -1; }
+function findSheet(wb, name){ return wb.SheetNames.filter(function(n){ return norm(n) === norm(name); })[0]; }
+function aoaOf(wb, name){ var n = findSheet(wb, name); return n && wb.Sheets[n] ? XLSX.utils.sheet_to_json(wb.Sheets[n], { header: 1, raw: true, defval: null, blankrows: false }) : null; }
+
+/* ================= leitura das abas ================= */
+function readCC(aoa){
+  var h = header(aoa, ["atendimento","pacote"]);
+  if (!h) throw new Error("Não encontrei o cabeçalho da aba Caminho Crítico (colunas Atendimento e Pacote).");
+  var H = h.head, c = {
+    prog: col(H,["programacao"]), marco: col(H,["demanda"]), wo: col(H,["wo"]), acft: col(H,["acft"]), pn: col(H,["pn"]), desc: col(H,["description"]),
+    nec: col(H,["data necessidade"]), prev: col(H,["previsao na cia"]), atend: col(H,["atendimento"]), resp: col(H,["responsavel"]),
+    order: col(H,["order no. (oh_orderno)"]), ext: col(H,["ext. order (oh_ext_orderno)"]), pacote: col(H,["pacote"]), ativ: col(H,["atividade"])
+  };
+  var out = [], seen = {};
+  for (var r = h.row + 1; r < aoa.length; r++) {
+    var a = aoa[r]; if (!a || (a[c.pn] == null && a[c.pacote] == null)) continue;
+    var g = function(k){ return c[k] >= 0 ? a[c[k]] : null; };
+    var x = { pacote: str(g("pacote")), acft: str(g("acft")), wo: str(g("wo")), pn: str(g("pn")), desc: str(g("desc")),
+      nec: toDay(g("nec")), prog: toDay(g("prog")), marco: str(g("marco")) || "?", prevDay: toDay(g("prev")), prevTipo: prevTipo(g("prev")),
+      st: statusOf(g("atend")), resp: str(g("resp")) || "Sem responsável", order: str(g("order")), ext: str(g("ext")), ativ: str(g("ativ")).replace(/^[:\s]+/, "") };
+    x.tipo = tipoPedido(x.order, x.ext);
+    var b = x.pacote + "|" + x.wo + "|" + x.pn; seen[b] = (seen[b] || 0) + 1; x.k = seen[b] > 1 ? b + "#" + seen[b] : b;
+    out.push(x);
+  }
+  if (!out.length) throw new Error("A aba Caminho Crítico está vazia.");
+  return out;
+}
+function readBE(aoa){
+  if (!aoa) return [];
+  var h = header(aoa, ["data da atualizacao","wp"]); if (!h) return [];
+  var H = h.head, c = { d: col(H,["data da atualizacao"]), acft: col(H,["acft"]), ini: col(H,["inicio"]), wp: col(H,["wp"]), disp: col(H,["% disponivel"]), tot: col(H,["qtde eventos"]), t180: col(H,["t180"]), at: col(H,["atendimento"]) };
+  var out = [];
+  for (var r = h.row + 1; r < aoa.length; r++) {
+    var a = aoa[r]; if (!a) continue;
+    var d = toDay(a[c.d]), ini = toDay(a[c.ini]); if (d == null || ini == null || !a[c.wp]) continue;
+    var disp = typeof a[c.disp] === "number" ? a[c.disp] : null; if (disp != null && disp > 1.5) disp = disp / 100;
+    var tot = typeof a[c.tot] === "number" ? a[c.tot] : null, at = c.at >= 0 && typeof a[c.at] === "number" ? a[c.at] : null;
+    out.push({ d: d, acft: str(a[c.acft]), ini: ini, wp: str(a[c.wp]), disp: disp, tot: tot, at: at, t180: typeof a[c.t180] === "number" ? a[c.t180] : null });
+  }
+  return out;
+}
+function readReg(aoa){
+  var m = {}; if (!aoa) return m;
+  var h = header(aoa, ["p/n","regularidade"]); if (!h) return m;
+  var cp = h.head.indexOf("p/n"), cr = h.head.indexOf("regularidade"), cc = col(h.head, ["consumo mes"]);
+  for (var r = h.row + 1; r < aoa.length; r++) { var a = aoa[r]; if (a && a[cp] != null) m[upn(a[cp])] = [str(a[cr]), typeof a[cc] === "number" ? a[cc] : null]; }
+  return m;
+}
+function read1328(aoa){
+  if (!aoa) return [];
+  var h = header(aoa, ["order no.","detail state"]); if (!h) return [];
+  var H = h.head, c = { o: col(H,["order no."]), st: col(H,["detail state"]), name: col(H,["name"]), bo: col(H,["backorder"]), tg: col(H,["target date"]), cf: col(H,["confirmed date:","confirmed date"]) };
+  var out = [];
+  for (var r = h.row + 1; r < aoa.length; r++) {
+    var a = aoa[r]; if (!a || !a[c.o]) continue;
+    out.push({ o: upn(a[c.o]), st: upn(a[c.st]), name: str(a[c.name]), bo: typeof a[c.bo] === "number" ? a[c.bo] : 0, due: toDay(a[c.cf]) != null ? toDay(a[c.cf]) : toDay(a[c.tg]) });
+  }
   return out;
 }
 
-/* ================= leitura: posição de estoque ================= */
-function parseStock(ws, fileName){
-  var aoa = XLSX.utils.sheet_to_json(ws, { header: 1, raw: true, defval: null, blankrows: false });
-  var h = -1;
-  for (var i = 0; i < Math.min(10, aoa.length); i++) { var hs = (aoa[i] || []).map(norm); if (hs.indexOf("partno") >= 0 && hs.indexOf("station") >= 0) { h = i; break; } }
-  if (h < 0) return null;
-  var head = aoa[h].map(norm);
-  var cPn = head.indexOf("partno"), cSt = head.indexOf("station"), cQty = head.indexOf("qty"), cDesc = head.indexOf("description");
-  var map = {}, desc = {}, byStation = {}, regs = 0, qtyTot = 0;
-  for (var r = h + 1; r < aoa.length; r++) {
-    var a = aoa[r]; if (!a || a[cPn] == null) continue;
-    var pn = upn(a[cPn]), st = upn(a[cSt]) || "?", q = typeof a[cQty] === "number" ? a[cQty] : parseFloat(a[cQty]) || 0;
-    var e = map[pn] || (map[pn] = {});
-    e[st] = (e[st] || 0) + q;
-    if (!desc[pn] && cDesc >= 0 && a[cDesc]) desc[pn] = str(a[cDesc]).slice(0, 60);
-    byStation[st] = (byStation[st] || 0) + 1;
-    regs++; qtyTot += q;
-  }
-  var compact = {};
-  Object.keys(map).forEach(function(pn){
-    compact[pn] = Object.keys(map[pn]).map(function(st){ return [st, Math.round(map[pn][st] * 1000) / 1000]; }).sort(function(x,y){ return y[1] - x[1]; });
-  });
-  return { arquivo: fileName, ts: Date.now(), dia: today(), regs: regs, qty: qtyTot, map: compact, desc: desc, byStation: byStation };
-}
-
-/* ================= histórico: mesclagem ================= */
-var FIELDS = ["pacote","acft","wo","pn","desc","qty","nec","prog","marco","prevDay","prevTxt","prevTipo","st","resp","obs","order","ext","tipo","ativ","acao"];
-function merge(oldRows, newRows, day){
-  var byKey = {}, res = [], s = { lidas: newRows.length, novas: 0, mudaram: 0, voltaram: 0, sairam: 0 };
-  oldRows.forEach(function(r){ byKey[r.k] = r; });
-  var inNew = {};
-  newRows.forEach(function(n){
-    inNew[n.k] = 1;
-    var o = byKey[n.k], r = { k: n.k };
-    FIELDS.forEach(function(f){ r[f] = n[f]; });
-    if (!o) { r.first = day; r.last = day; r.gone = null; r.chg = day; r.hist = [[day, n.st]]; s.novas++; }
-    else {
-      r.first = o.first; r.last = day; r.gone = null; r.hist = (o.hist || []).slice(); r.chg = o.chg;
-      if (o.gone != null) s.voltaram++;
-      var last = r.hist.length ? r.hist[r.hist.length-1][1] : null;
-      if (last !== n.st) {
-        if (r.hist.length && r.hist[r.hist.length-1][0] === day) r.hist[r.hist.length-1] = [day, n.st]; else r.hist.push([day, n.st]);
-        r.chg = day; s.mudaram++;
-      }
-    }
-    res.push(r);
-  });
-  oldRows.forEach(function(o){
-    if (inNew[o.k]) return;
-    var r = {}; Object.keys(o).forEach(function(f){ r[f] = o[f]; });
-    if (r.gone == null) { r.gone = day; s.sairam++; }
-    res.push(r);
-  });
-  return { rows: res, stats: s };
-}
+/* ================= cálculo do retrato gerencial ================= */
 function isBack(r){ return !!r.order && (r.prevTipo === "sem" || (r.prevDay != null && r.nec != null && r.prevDay > r.nec)); }
-function summarize(rows, day, file, stats){
-  var s = { ts: Date.now(), dia: day, arquivo: file, ativas: 0, d: 0, a: 0, n: 0, back: 0 };
-  rows.forEach(function(r){ if (r.gone != null) return; s.ativas++; s[r.st]++; if (isBack(r)) s.back++; });
-  ["lidas","novas","mudaram","voltaram","sairam"].forEach(function(k){ s[k] = stats[k]; });
-  return s;
-}
-
-/* ================= armazenamento local ================= */
-var PACK = ["k"].concat(FIELDS).concat(["first","last","gone","chg","hist"]);
-function pack(r){ return PACK.map(function(f){ return r[f] === undefined ? null : r[f]; }); }
-function unpack(a){ var r = {}; PACK.forEach(function(f, i){ r[f] = a[i]; }); if (!r.hist) r.hist = []; return r; }
-function openDb(){ return new Promise(function(res, rej){ try { var rq = indexedDB.open(DB, 1); rq.onupgradeneeded = function(){ rq.result.createObjectStore("s"); }; rq.onsuccess = function(){ res(rq.result); }; rq.onerror = function(){ rej(rq.error); }; } catch(e){ rej(e); } }); }
-function dbGet(key){ return openDb().then(function(db){ return new Promise(function(res){ try { var rq = db.transaction("s").objectStore("s").get(key); rq.onsuccess = function(){ res(rq.result || null); }; rq.onerror = function(){ res(null); }; } catch(e){ res(null); } }); }).catch(function(){ return null; }); }
-function dbPut(key, val){ return openDb().then(function(db){ return new Promise(function(res, rej){ var tx = db.transaction("s","readwrite"); tx.objectStore("s").put(val, key); tx.oncomplete = res; tx.onerror = function(){ rej(tx.error); }; }); }); }
-function dbDel(key){ return openDb().then(function(db){ return new Promise(function(res){ var tx = db.transaction("s","readwrite"); tx.objectStore("s").delete(key); tx.oncomplete = res; tx.onerror = res; }); }).catch(function(){}); }
-function savePre(){ return dbPut("pre", { meta: S.meta, rows: S.rows.map(pack), cargas: S.cargas }); }
-function saveStock(){ return dbPut("estoque", S.stock); }
-
-/* ================= carregar arquivos ================= */
-function overlay(msg){ if (msg) { $("overlayMsg").textContent = msg; $("overlay").classList.add("on"); } else $("overlay").classList.remove("on"); }
-function fail(msg){
-  overlay(null);
-  if (S.rows.length || S.stock) window.alert(msg);
-  else { $("emptyMsg").className = "msg err"; $("emptyMsg").textContent = msg; }
-}
-function handleFiles(list){
-  if (typeof XLSX === "undefined") { fail("A biblioteca que lê o Excel não carregou. Confira a conexão com a internet e recarregue a página."); return; }
-  queue = Array.prototype.slice.call(list || []).filter(function(f){ return /\.xls[xm]?$/i.test(f.name); });
-  if (!queue.length) { fail("Escolha arquivos do Excel (.xlsx)."); return; }
-  nextFile();
-}
-function nextFile(){
-  var file = queue.shift();
-  if (!file) { overlay(null); return; }
-  overlay("Lendo “" + file.name + "”…");
-  var reader = new FileReader();
-  reader.onerror = function(){ fail("Não foi possível ler “" + file.name + "”."); };
-  reader.onload = function(e){
-    setTimeout(function(){
-      try {
-        var buf = new Uint8Array(e.target.result);
-        var wb = XLSX.read(buf, { type: "array", sheets: [SHEET], dense: true, cellDates: false, cellFormula: false, cellHTML: false, cellText: false, cellStyles: false });
-        var preName = wb.SheetNames.filter(function(n){ return norm(n) === norm(SHEET); })[0];
-        if (preName) {
-          if (!wb.Sheets[preName]) wb = XLSX.read(buf, { type: "array", sheets: [preName], dense: true, cellDates: false, cellFormula: false, cellHTML: false, cellText: false });
-          var newRows = parsePre(wb.Sheets[preName]);
-          overlay(null);
-          var day = today();
-          pending = { file: file.name, day: day, newRows: newRows, merged: merge(S.rows, newRows, day) };
-          openConfirm();
-          return;
-        }
-        var first = wb.SheetNames[0];
-        var wb2 = XLSX.read(buf, { type: "array", sheets: [first], dense: true, cellDates: false, cellFormula: false, cellHTML: false, cellText: false });
-        var stock = parseStock(wb2.Sheets[first], file.name);
-        if (!stock) throw new Error("“" + file.name + "” não parece ser a planilha de pré-indução (aba Caminho Crítico) nem a Posição de estoque (colunas partno e station).");
-        S.stock = stock;
-        overlay("Salvando posição de estoque…");
-        saveStock().catch(function(){}).then(function(){ showDash(); nextFile(); });
-      } catch(err) { fail(err.message || String(err)); }
-    }, 40);
-  };
-  reader.readAsArrayBuffer(file);
-}
-function openConfirm(){
-  var s = pending.merged.stats;
-  $("cfFile").textContent = pending.file + ", carga de " + fd(pending.day);
-  $("cfStats").innerHTML = [["Linhas lidas", s.lidas], ["Linhas novas", s.novas], ["Mudaram de status", s.mudaram], ["Voltaram para a planilha", s.voltaram], ["Saíram da planilha", s.sairam]]
-    .map(function(x){ return "<dt>" + x[0] + "</dt><dd>" + fi(x[1]) + "</dd>"; }).join("");
-  $("confirm").classList.add("on"); $("cfSave").focus();
-}
-function closeConfirm(){ $("confirm").classList.remove("on"); }
-function saveCarga(){
-  closeConfirm();
-  var p = pending; pending = null;
-  var carga = summarize(p.merged.rows, p.day, p.file, p.merged.stats);
-  S.rows = p.merged.rows;
-  S.cargas = S.cargas.filter(function(c){ return c.dia !== p.day; }).concat([carga]);
-  S.meta = { arquivo: p.file, ts: carga.ts, dia: p.day };
-  overlay("Salvando histórico…");
-  savePre().then(function(){ showDash(); nextFile(); }).catch(function(e){ fail("A carga não foi salva no navegador (" + ((e && e.message) || "erro") + ")."); });
-}
-
-/* ================= filtros ================= */
-function F(){ return { ev: $("fEvento").value, resp: $("fResp").value, ativ: $("fAtiv").value, q: norm($("fBusca").value) }; }
-function match(r, f, ignoreEv){
-  if (!ignoreEv && f.ev && r.pacote !== f.ev) return false;
-  if (f.resp && r.resp !== f.resp) return false;
-  if (f.ativ && r.ativ !== f.ativ) return false;
-  if (f.q && norm(r.pn + " " + r.desc + " " + r.wo + " " + r.order + " " + r.ext).indexOf(f.q) < 0) return false;
-  return true;
-}
-function uniq(rows, k){ var s = {}; rows.forEach(function(r){ if (r[k]) s[r[k]] = 1; }); return Object.keys(s); }
-function mostCommon(arr){ var c = {}, best = "", n = 0; arr.forEach(function(x){ c[x] = (c[x]||0)+1; if (c[x] > n){ n = c[x]; best = x; } }); return best; }
-function fillSelect(id, opts){
-  var el = $(id), keep = el.value;
-  el.innerHTML = opts.map(function(o){ return '<option value="' + esc(o[0]) + '">' + esc(o[1]) + "</option>"; }).join("");
-  if (opts.some(function(o){ return o[0] === keep; })) el.value = keep;
-}
-function lastDay(){ return S.cargas.length ? S.cargas[S.cargas.length-1].dia : null; }
-function stockOf(pn){ return S.stock ? S.stock.map[upn(pn)] || null : null; }
-function stockTotal(pn){ var s = stockOf(pn); return s ? s.reduce(function(t,x){ return t + x[1]; }, 0) : 0; }
-function stockTxt(pn){ var s = stockOf(pn); return s ? s.slice(0, 6).map(function(x){ return x[0] + " " + fi(x[1]); }).join(", ") + (s.length > 6 ? " e mais " + (s.length - 6) : "") : ""; }
-
-/* ================= montagem ================= */
-function showDash(){
-  var hasPre = S.rows.length > 0;
-  var active = S.rows.filter(function(r){ return r.gone == null; });
-  var byPac = {};
-  active.forEach(function(r){ (byPac[r.pacote] = byPac[r.pacote] || []).push(r); });
-  S.events = Object.keys(byPac).map(function(p){
-    var rs = byPac[p];
-    var prog = rs.reduce(function(m,r){ return r.prog != null && (m == null || r.prog < m) ? r.prog : m; }, null);
-    return { pacote: p, prog: prog, acft: mostCommon(rs.map(function(r){ return r.acft; })), ativ: mostCommon(rs.map(function(r){ return r.ativ; })) };
-  }).sort(function(a,b){ return (a.prog||0) - (b.prog||0) || a.pacote.localeCompare(b.pacote); });
-
-  fillSelect("fEvento", [["","Todas"]].concat(S.events.map(function(e){ return [e.pacote, e.acft + " (" + fd(e.prog, true) + ") " + e.pacote]; })));
-  fillSelect("fResp", [["","Todos"]].concat(uniq(S.rows,"resp").sort().map(function(x){ return [x,x]; })));
-  fillSelect("fAtiv", [["","Todas"]].concat(uniq(S.rows,"ativ").sort().map(function(x){ return [x,x]; })));
-  fillSelect("fMarco", [["","Todos"]].concat(uniq(S.rows,"marco").sort(function(a,b){ return marcoOrder(a) - marcoOrder(b); }).map(function(x){ return [x,x]; })));
-
-  $("srcPre").className = "src" + (hasPre ? (S.meta && S.meta.dia === today() ? " ok" : " old") : "");
-  $("srcPreTxt").textContent = hasPre ? S.meta.arquivo + ", carregada em " + new Date(S.meta.ts).toLocaleString("pt-BR") : "Ainda não carregada";
-  $("srcEst").className = "src" + (S.stock ? (S.stock.dia === today() ? " ok" : " old") : "");
-  $("srcEstTxt").textContent = S.stock ? S.stock.arquivo + ", carregada em " + new Date(S.stock.ts).toLocaleString("pt-BR") : "Ainda não carregada (opcional)";
-
-  var any = hasPre || !!S.stock;
-  $("empty").classList.toggle("hidden", any);
-  $("dash").classList.toggle("hidden", !any);
-  if (any) $("emptyMsg").textContent = "";
-  var gone = S.rows.length - active.length;
-  $("note").textContent = hasPre ? "Histórico neste navegador: " + pl(S.cargas.length, "carga", "cargas") + ", " + pl(active.length, "linha ativa", "linhas ativas") + " e " + pl(gone, "linha que já saiu da planilha", "linhas que já saíram da planilha") + "." : "";
-  render();
-}
-
-function render(){
-  var hasPre = S.rows.length > 0;
-  ["visao","preinducao","pedidos"].forEach(function(v){
-    document.querySelector('[data-view="' + v + '"]').classList.toggle("hidden", S.tab !== v);
-  });
-  document.querySelector('[data-view="estoque"]').classList.toggle("hidden", S.tab !== "estoque");
-  document.querySelectorAll(".tabs a").forEach(function(a){ if (a.getAttribute("data-tab") === S.tab) a.setAttribute("aria-current","page"); else a.removeAttribute("aria-current"); });
-  if (!hasPre && S.tab !== "estoque") {
-    var v = document.querySelector('[data-view="' + S.tab + '"]');
-    if (v && !v.querySelector(".needpre")) v.insertAdjacentHTML("afterbegin", '<div class="drop needpre" tabindex="0"><h2>Carregue a planilha de pré-indução</h2><p>Esta seção usa a aba Caminho Crítico. Clique ou solte o arquivo aqui.</p></div>');
-  }
-  document.querySelectorAll(".needpre").forEach(function(n){ if (hasPre) n.remove(); });
-  var f = F();
-  if (S.tab === "visao" && hasPre) renderVisao(f);
-  if (S.tab === "preinducao" && hasPre) renderPre(f);
-  if (S.tab === "pedidos" && hasPre) renderPed(f);
-  if (S.tab === "estoque") renderEst(f);
-}
-function kpis(id, items){
-  $(id).innerHTML = items.map(function(x){ return '<div class="' + (x[2] || "") + '"><b>' + x[0] + "</b><span>" + x[1] + "</span></div>"; }).join("");
-}
-function bars(id, arr, color, clickKey){
-  var max = arr.reduce(function(m,x){ return Math.max(m, x[1]); }, 0);
-  $(id).innerHTML = arr.length ? arr.map(function(x){
-    var inner = "<span>" + esc(x[0]) + '</span><span class="track"><span style="width:' + pct(x[1], max) + "%;background:" + (x[2] || color) + '"></span></span><b>' + fi(x[1]) + "</b>";
-    return clickKey ? '<button type="button" class="hb" data-' + clickKey + '="' + esc(x[3] || x[0]) + '">' + inner + "</button>" : '<div class="hb">' + inner + "</div>";
-  }).join("") : '<p class="empty">Nada com os filtros atuais.</p>';
-}
-function countBy(rows, key){ var c = {}; rows.forEach(function(r){ c[r[key]] = (c[r[key]]||0)+1; }); return Object.keys(c).map(function(k){ return [k, c[k]]; }); }
-
-/* ---------- visão geral ---------- */
-function renderVisao(f){
-  var base = S.rows.filter(function(r){ return r.gone == null && match(r, f, false); });
-  var c = { d: 0, a: 0, n: 0 }, back = 0, semPed = 0, comEst = 0;
-  base.forEach(function(r){ c[r.st]++; if (isBack(r)) back++; if (r.st === "n" && !r.order) semPed++; if (r.st === "n" && stockTotal(r.pn) > 0) comEst++; });
-  var t = base.length;
-  kpis("kVisao", [
-    [fi(t), "linhas ativas"],
-    [fp(c.d, t), "material disponível", "good"],
-    [fp(c.d + c.a, t), "atendido (disponível ou chega a tempo)"],
-    [fi(c.n), "linhas que não atendem", "bad"],
-    [fi(back), "em backorder (pedido atrasado ou sem previsão)", "warn"],
-    S.stock ? [fi(comEst), "não atendem, mas têm estoque em alguma base"] : [fi(semPed), "não atendem e ainda não têm pedido"]
-  ]);
-  renderTimeline(f);
-  renderTrend();
-
-  var nao = base.filter(function(r){ return r.st === "n"; });
-  var g = {};
-  nao.forEach(function(r){
-    var e = g[r.pn] || (g[r.pn] = { pn: r.pn, desc: r.desc, linhas: 0, qty: 0, acft: {}, nec: null, ped: 0 });
-    e.linhas++; e.qty += typeof r.qty === "number" ? r.qty : 0; e.acft[r.acft] = 1;
-    if (r.nec != null && (e.nec == null || r.nec < e.nec)) e.nec = r.nec;
-    if (r.order) e.ped++;
-  });
-  var top = Object.keys(g).map(function(k){ var e = g[k]; e.nAcft = Object.keys(e.acft).length; e.est = stockTotal(e.pn); return e; })
-    .sort(function(a,b){ return b.linhas - a.linhas || (a.nec||0) - (b.nec||0); }).slice(0, 10);
-  $("topPn").innerHTML = top.length ? '<div class="scroll"><table><thead><tr><th>PN</th><th>Descrição</th><th class="num">Linhas</th><th class="num">Acft</th><th>1ª necessidade</th>' + (S.stock ? '<th class="num">Estoque</th>' : "") + "</tr></thead><tbody>" +
-    top.map(function(e){ return '<tr class="click" data-pn="' + esc(e.pn) + '"><td>' + esc(e.pn) + '</td><td class="desc">' + esc(e.desc) + '</td><td class="num">' + fi(e.linhas) + '</td><td class="num">' + e.nAcft + "</td><td>" + fd(e.nec) + "</td>" + (S.stock ? '<td class="num">' + fi(e.est) + "</td>" : "") + "</tr>"; }).join("") +
-    "</tbody></table></div>" : '<p class="empty">Nenhuma linha que não atende com os filtros atuais.</p>';
-
-  var byAcft = {};
-  S.rows.forEach(function(r){ if (r.gone != null || r.st !== "n" || !match(r, f, true)) return; var k = r.pacote; byAcft[k] = (byAcft[k] || 0) + 1; });
-  var evMap = {}; S.events.forEach(function(e){ evMap[e.pacote] = e; });
-  bars("topAcft", Object.keys(byAcft).map(function(k){ var e = evMap[k] || {}; return [(e.acft || "?") + " (" + fd(e.prog, true) + ")", byAcft[k], null, k]; }).sort(function(a,b){ return b[1]-a[1]; }).slice(0, 10), "var(--nao)", "ev");
-  bars("byResp", countBy(nao, "resp").sort(function(a,b){ return b[1]-a[1]; }), "var(--nao)");
-  var pc = {}; base.forEach(function(r){ pc[r.prevTipo] = (pc[r.prevTipo] || 0) + 1; });
-  var colors = { estoque: "var(--disp)", transferir: "var(--navy)", data: "var(--atende)", sem: "var(--nao)", mro: "var(--muted)", paliativo: "var(--muted)", outro: "var(--muted)" };
-  bars("byPrev", ["estoque","transferir","data","sem","mro","paliativo","outro"].filter(function(k){ return pc[k]; }).map(function(k){ return [PREV_LBL[k], pc[k], colors[k]]; }), "var(--navy)");
-}
-
-function evAgg(f){
-  var agg = {};
-  S.rows.forEach(function(r){ if (r.gone != null || !match(r, f, true)) return; var a = agg[r.pacote] || (agg[r.pacote] = { d:0, a:0, n:0, t:0 }); a[r.st]++; a.t++; });
-  return agg;
-}
-function renderTimeline(f){
-  var agg = evAgg(f), t0 = today(), MAX = 180;
-  var marks = [[0,"Hoje"],[7,""],[45,"T-45"],[60,"T-60"],[120,"T-120"],[180,"T-180"]];
-  var x = function(d){ return Math.max(0, Math.min(MAX, d)) / MAX * 100; };
-  var evs = S.events.filter(function(e){ return agg[e.pacote]; });
-  var alerts = [];
-  var rows = evs.map(function(e){
-    var a = agg[e.pacote], days = e.prog != null ? e.prog - t0 : null, at = Math.round(pct(a.d + a.a, a.t));
-    var cls = a.n === 0 ? "ok" : (days != null && days <= 60 ? "bad" : "mid");
-    if (a.n > 0 && days != null && days <= 60) alerts.push({ e: e, days: days, n: a.n, at: at });
-    var sel = f.ev === e.pacote ? " sel" : "";
-    var when = days == null ? "sem data" : days < 0 ? "em execução" : days === 0 ? "hoje" : "em " + pl(days, "dia", "dias");
-    return '<button type="button" class="tl-row' + sel + '" data-ev="' + esc(e.pacote) + '" title="' + esc(e.acft + ", " + e.ativ + ", " + fd(e.prog) + ", " + a.t + " linhas, " + a.n + " não atendem") + '">' +
-      '<span class="tl-name">' + esc(e.acft) + "<small>" + fd(e.prog, true) + ", " + when + "</small></span>" +
-      '<span class="tl-track"><span class="tl-pill ' + cls + (days != null && days < 0 ? " past" : "") + '" style="left:' + x(days == null ? MAX : days) + '%">' + at + "%</span></span>" +
-      '<span class="tl-pct" style="color:' + (a.n ? "var(--nao)" : "var(--disp)") + '">' + (a.n ? fi(a.n) : "✓") + "</span></button>";
-  }).join("");
-  var scale = marks.filter(function(m){ return m[1]; }).map(function(m){ return '<span style="left:' + x(m[0]) + '%"><b>' + m[1] + "</b>" + (m[0] ? fd(t0 + m[0], true) : fd(t0, true)) + "</span>"; }).join("");
-  var guides = '<span class="zone" style="width:' + x(60) + '%"></span>' + marks.slice(1).map(function(m){ return '<i style="left:' + x(m[0]) + '%"></i>'; }).join("");
-  $("timeline").innerHTML = evs.length ? '<div class="tl-axis"><span>Aeronave</span><div class="tl-scale">' + scale + '</div><span style="text-align:right">Pend.</span></div>' +
-    '<div class="tl-body"><div class="tl-guides">' + guides + "</div>" + rows + "</div>" : '<p class="empty">Nenhuma aeronave com os filtros atuais.</p>';
-  alerts.sort(function(a,b){ return a.days - b.days; });
-  $("alerts").innerHTML = alerts.length ? alerts.map(function(x){
-    return '<button type="button" class="alert" data-ev="' + esc(x.e.pacote) + '"><b class="reg">' + esc(x.e.acft) + '</b><span><span class="marco">' + marcoAtual(x.days) + "</span>" + fd(x.e.prog) + '<br><span class="why">' + x.at + "% atendido, " + esc(x.e.ativ) + '</span></span><span class="n">' + fi(x.n) + "</span></button>";
-  }).join("") : '<p class="empty">Nenhuma aeronave fora da meta. Todas as induções dos próximos 60 dias estão 100% atendidas.</p>';
-}
-function renderTrend(){
-  var cs = S.cargas.slice(-30), svg = $("trend");
-  if (cs.length < 2) {
-    svg.innerHTML = '<text x="200" y="78" text-anchor="middle">O gráfico aparece a partir da segunda carga.</text>';
-    $("trendNote").textContent = cs.length ? "1 carga salva, em " + fd(cs[0].dia) + "." : "";
-    return;
-  }
-  var W = 400, H = 150, L = 6, R = 6, T = 10, B = 18;
-  var xx = function(i){ return L + i * (W - L - R) / (cs.length - 1); };
-  var pa = cs.map(function(c){ return pct(c.d + c.a, c.ativas); });
-  var mn = Math.min.apply(null, pa), mx = Math.max.apply(null, pa); if (mx - mn < 2) { mn -= 1; mx += 1; }
-  var nn = cs.map(function(c){ return c.n; }), nmax = Math.max.apply(null, nn) || 1;
-  var y1 = function(v){ return T + (1 - (v - mn) / (mx - mn)) * (H - T - B); };
-  var y2 = function(v){ return T + (1 - v / nmax) * (H - T - B); };
-  var path = function(vals, y){ return vals.map(function(v,i){ return (i ? "L" : "M") + xx(i).toFixed(1) + " " + y(v).toFixed(1); }).join(" "); };
-  svg.innerHTML = '<line x1="0" x2="400" y1="' + (H - B) + '" y2="' + (H - B) + '"/><path class="l1" d="' + path(pa, y1) + '"/><path class="l2" d="' + path(nn, y2) + '"/>' +
-    '<text x="' + L + '" y="' + (H - 4) + '">' + fd(cs[0].dia, true) + '</text><text x="' + (W - R) + '" y="' + (H - 4) + '" text-anchor="end">' + fd(cs[cs.length-1].dia, true) + "</text>";
-  var a = cs[cs.length-2], b = cs[cs.length-1], d = b.n - a.n;
-  $("trendNote").textContent = "Desde a carga anterior (" + fd(a.dia, true) + "): " + (d === 0 ? "mesma quantidade de linhas que não atendem" : (d > 0 ? "+" : "") + fi(d) + " linhas que não atendem") + ", " + pl(b.novas || 0, "linha nova", "linhas novas") + ", " + pl(b.mudaram || 0, "mudança de status", "mudanças de status") + ".";
-}
-
-/* ---------- tabelas ---------- */
-var TB = {};
-function table(id, cols, rows, opts){
-  opts = opts || {};
-  var t = TB[id] || (TB[id] = { key: opts.key || cols[0].k, dir: opts.dir || 1, page: 0 });
-  t.cols = cols;
-  var col = cols.filter(function(c){ return c.k === t.key; })[0] || cols[0];
-  var val = col.val || function(r){ return r[col.k]; };
-  rows = rows.slice().sort(function(a,b){
-    var x = val(a), y = val(b);
-    if (x == null || x === "") return 1; if (y == null || y === "") return -1;
-    if (typeof x === "number" && typeof y === "number") return (x - y) * t.dir;
-    return String(x).localeCompare(String(y), "pt-BR", { numeric: true }) * t.dir;
-  });
-  t.rows = rows;
-  var size = opts.page || 100, pages = Math.max(1, Math.ceil(rows.length / size));
-  if (t.page >= pages) t.page = pages - 1;
-  var head = cols.map(function(c){ return '<th scope="col" tabindex="0" data-k="' + c.k + '"' + (c.num ? ' class="num"' : "") + ' aria-sort="' + (c.k === t.key ? (t.dir > 0 ? "ascending" : "descending") : "none") + '">' + c.label + "</th>"; }).join("");
-  var body = rows.slice(t.page * size, t.page * size + size).map(function(r){
-    return "<tr>" + cols.map(function(c){ return "<td" + (c.cls ? ' class="' + (typeof c.cls === "function" ? c.cls(r) : c.cls) + '"' : c.num ? ' class="num"' : "") + ">" + (c.html ? c.html(r) : esc(c.txt ? c.txt(r) : r[c.k])) + "</td>"; }).join("") + "</tr>";
-  }).join("") || '<tr><td colspan="' + cols.length + '">Nenhuma linha com os filtros atuais.</td></tr>';
-  $(id).innerHTML = '<div class="scroll"><table class="wide"><thead><tr>' + head + "</tr></thead><tbody>" + body + "</tbody></table></div>" +
-    (pages > 1 ? '<div class="pager"><button class="btn small" type="button" data-pg="-1"' + (t.page === 0 ? " disabled" : "") + '>Anterior</button><span>Página ' + (t.page + 1) + " de " + pages + '</span><button class="btn small" type="button" data-pg="1"' + (t.page >= pages - 1 ? " disabled" : "") + ">Próxima</button></div>" : "");
-}
-function wireTable(id){
-  $(id).addEventListener("click", function(e){
-    var th = e.target.closest("th[data-k]"), pg = e.target.closest("[data-pg]"), t = TB[id];
-    if (th && t) { var k = th.getAttribute("data-k"); if (t.key === k) t.dir *= -1; else { t.key = k; t.dir = 1; } t.page = 0; render(); }
-    if (pg && t) { t.page += parseInt(pg.getAttribute("data-pg"), 10); render(); }
-  });
-  $(id).addEventListener("keydown", function(e){ if (e.key === "Enter" && e.target.matches("th[data-k]")) e.target.click(); });
-}
-function exportCsv(id){
-  var t = TB[id]; if (!t) return;
-  var cell = function(v){ v = v == null ? "" : String(v); return /[;"\n]/.test(v) ? '"' + v.replace(/"/g,'""') + '"' : v; };
-  var lines = [t.cols.map(function(c){ return c.label; }).join(";")];
-  t.rows.forEach(function(r){ lines.push(t.cols.map(function(c){ return cell(c.csv ? c.csv(r) : c.txt ? c.txt(r) : r[c.k]); }).join(";")); });
-  download("\ufeff" + lines.join("\r\n"), "preinducao-" + id + "-" + new Date().toISOString().slice(0,10) + ".csv", "text/csv;charset=utf-8");
-}
-function download(text, name, type){
-  var a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([text], { type: type })); a.download = name;
-  document.body.appendChild(a); a.click(); a.remove(); setTimeout(function(){ URL.revokeObjectURL(a.href); }, 1500);
-}
-function stTag(r){ return r.gone != null ? '<span class="tag gone">Saiu em ' + fd(r.gone, true) + "</span>" : '<span class="tag ' + ST_CLS[r.st] + '">' + ST_LBL[r.st] + "</span>"; }
-function prevText(r){ return r.prevDay != null ? fd(r.prevDay) : r.prevTxt; }
-function histText(r){ var h = r.hist.map(function(x){ return fd(x[0], true) + " " + ST_SHORT[x[1]]; }); if (r.gone != null) h.push(fd(r.gone, true) + " saiu"); return h.join(" → "); }
-function qtyTxt(r){ return typeof r.qty === "number" ? r.qty.toLocaleString("pt-BR") : r.qty; }
-function atraso(r){ return r.prevDay != null && r.nec != null ? r.prevDay - r.nec : null; }
-
-/* ---------- pré-indução ---------- */
-function renderPre(f){
-  var base = S.rows.filter(function(r){ return r.gone == null && match(r, f, false); });
-  var c = { d: 0, a: 0, n: 0 }; base.forEach(function(r){ c[r.st]++; });
-  var d = lastDay(), mud = 0, nov = 0;
-  base.forEach(function(r){ if (r.first === d) nov++; else if (r.chg === d && r.hist.length > 1) mud++; });
-  kpis("kPre", [
-    [fi(base.length), "linhas ativas"], [fi(c.d), "disponíveis", "good"], [fi(c.a), "chegam a tempo", "warn"],
-    [fi(c.n), "não atendem", "bad"], [fi(nov), "entraram na última carga"], [fi(mud), "mudaram de status na última carga"]
-  ]);
-  var st = $("fStatus").value, marco = $("fMarco").value, md = $("fMud").value;
-  var rows = S.rows.filter(function(r){
-    if (!match(r, f, false)) return false;
-    if (st === "gone") { if (r.gone == null) return false; }
-    else { if (r.gone != null) return false; if (st !== "ativas" && r.st !== st) return false; }
-    if (marco && r.marco !== marco) return false;
-    if (md === "mudou" && !(r.chg === d && r.first !== d && r.hist.length > 1)) return false;
-    if (md === "nova" && r.first !== d) return false;
-    return true;
-  });
-  $("preCount").textContent = pl(rows.length, "linha", "linhas");
-  table("tPre", [
-    { k: "acft", label: "Acft" }, { k: "pacote", label: "Pacote" },
-    { k: "nec", label: "Necessidade", txt: function(r){ return fd(r.nec); } },
-    { k: "pn", label: "PN" }, { k: "desc", label: "Descrição", cls: "desc" },
-    { k: "qty", label: "Qtd", num: true, txt: qtyTxt },
-    { k: "st", label: "Status", html: stTag, csv: function(r){ return r.gone != null ? "Saiu da planilha" : ST_LBL[r.st]; } },
-    { k: "resp", label: "Responsável" },
-    { k: "prevDay", label: "Previsão", txt: prevText, val: function(r){ return r.prevDay != null ? r.prevDay : r.prevTxt; } },
-    { k: "order", label: "Pedido" }, { k: "marco", label: "Marco" },
-    { k: "first", label: "Desde", txt: function(r){ return fd(r.first, true); } },
-    { k: "hist", label: "Histórico de status", cls: "hist", txt: histText, val: function(r){ return r.hist.length; } },
-    { k: "obs", label: "Observações", cls: "obs" }
-  ], rows, { key: "nec" });
-}
-
-/* ---------- pedidos ---------- */
-function renderPed(f){
+function build(rows, be, reg, ord, oldPend, file){
   var t0 = today();
-  var base = S.rows.filter(function(r){ return r.gone == null && match(r, f, false); });
-  var ped = base.filter(function(r){ return r.order; });
-  var tipos = { "PO de compra": 0, "Requisição (RC)": 0, "Reparo (RO)": 0, "Produção (MP)": 0, "Outro": 0 }, atr = 0, sem = 0;
-  ped.forEach(function(r){ tipos[r.tipo || "Outro"]++; var x = atraso(r); if (x != null && x > 0) atr++; if (r.prevTipo === "sem") sem++; });
-  kpis("kPed", [
-    [fi(ped.length), "linhas com pedido"], [fi(tipos["PO de compra"]), "com PO de compra"], [fi(tipos["Requisição (RC)"]), "com requisição (RC), aguardando PO"],
-    [fi(tipos["Reparo (RO)"] + tipos["Produção (MP)"]), "em reparo (RO) ou produção (MP)"], [fi(atr), "com previsão depois da necessidade", "bad"], [fi(sem), "com pedido, sem previsão", "warn"]
-  ]);
-  var weeks = [];
-  for (var w = 0; w < 8; w++) weeks.push({ ini: t0 + w * 7, n: 0 });
-  ped.forEach(function(r){ if (r.prevDay == null || r.prevDay < t0) return; var i = Math.floor((r.prevDay - t0) / 7); if (i < 8) weeks[i].n++; });
-  var wmax = weeks.reduce(function(m,x){ return Math.max(m, x.n); }, 0) || 1;
-  $("weeks").innerHTML = weeks.map(function(x){ return '<div title="' + fd(x.ini) + " a " + fd(x.ini + 6) + '"><b>' + (x.n || "") + '</b><span class="bar" style="height:' + Math.max(2, pct(x.n, wmax) * 0.82) + '%"></span><em>' + fd(x.ini, true) + "</em></div>"; }).join("");
-
-  var g = {};
-  ped.filter(isBack).forEach(function(r){
-    var e = g[r.order] || (g[r.order] = { order: r.order, ext: r.ext, tipo: r.tipo, linhas: 0, acft: {}, maior: null, sem: r.prevTipo === "sem" });
-    e.linhas++; e.acft[r.acft] = 1; var x = atraso(r); if (x != null && (e.maior == null || x > e.maior)) e.maior = x;
+  /* eventos */
+  var ev = {};
+  rows.forEach(function(r){
+    var e = ev[r.pacote] || (ev[r.pacote] = { p: r.pacote, acftC: {}, ativC: {}, prog: null, t: 0, d: 0, a: 0, n: 0, fora: 0, transf: 0, resp: {} });
+    e.t++; e[r.st]++; e.acftC[r.acft] = (e.acftC[r.acft] || 0) + 1; e.ativC[r.ativ] = (e.ativC[r.ativ] || 0) + 1;
+    if (r.prog != null && (e.prog == null || r.prog < e.prog)) e.prog = r.prog;
+    if (r.marco && r.marco.toUpperCase() !== "T180") e.fora++;
+    if (r.prevTipo === "transferir") e.transf++;
+    if (r.st === "n") e.resp[r.resp] = (e.resp[r.resp] || 0) + 1;
   });
-  var top = Object.keys(g).map(function(k){ var e = g[k]; e.nAcft = Object.keys(e.acft).length; return e; }).sort(function(a,b){ return b.linhas - a.linhas || (b.maior||0) - (a.maior||0); }).slice(0, 10);
-  $("topPed").innerHTML = top.length ? '<div class="scroll"><table><thead><tr><th>Pedido</th><th>Ext. order</th><th>Tipo</th><th class="num">Linhas</th><th class="num">Acft</th><th class="num">Atraso</th></tr></thead><tbody>' +
-    top.map(function(e){ return '<tr class="click" data-q="' + esc(e.order) + '"><td>' + esc(e.order) + "</td><td>" + esc(e.ext) + "</td><td>" + esc(e.tipo) + '</td><td class="num">' + fi(e.linhas) + '</td><td class="num">' + e.nAcft + '</td><td class="num">' + (e.maior != null ? pl(e.maior, "dia", "dias") : "sem previsão") + "</td></tr>"; }).join("") +
-    "</tbody></table></div>" : '<p class="empty">Nenhum pedido em backorder com os filtros atuais.</p>';
+  var top = function(o){ var b = "", n = -1; Object.keys(o).forEach(function(k){ if (o[k] > n) { n = o[k]; b = k; } }); return b; };
+  var events = Object.keys(ev).map(function(k){
+    var e = ev[k]; e.acft = top(e.acftC); e.ativ = top(e.ativC); delete e.acftC; delete e.ativC;
+    e.days = e.prog != null ? e.prog - t0 : null; return e;
+  }).filter(function(e){ return e.days == null || e.days >= -60; }).sort(function(a,b){ return (a.prog||0) - (b.prog||0); });
 
-  var sit = $("fSit").value, tipo = $("fTipo").value;
-  var rows = ped.filter(function(r){
-    if (tipo && (r.tipo || "Outro") !== tipo) return false;
-    var x = atraso(r);
-    if (sit === "back") return isBack(r);
-    if (sit === "atrasado") return x != null && x > 0;
-    if (sit === "sem") return r.prevTipo === "sem";
-    if (sit === "prazo") return !isBack(r);
-    return true;
+  /* pendências e tempo */
+  var pend = {}, idades = [], respAge = {}, resolvidas = 0, tRes = [];
+  rows.forEach(function(r){
+    if (r.st !== "n") return;
+    var first = oldPend[r.k] != null ? oldPend[r.k] : t0;
+    pend[r.k] = first; idades.push(t0 - first);
+    var ra = respAge[r.resp] || (respAge[r.resp] = { n: 0, soma: 0 }); ra.n++; ra.soma += t0 - first;
   });
-  $("pedCount").textContent = pl(rows.length, "linha", "linhas");
-  table("tPed", [
-    { k: "order", label: "Pedido" }, { k: "ext", label: "Ext. order" }, { k: "tipo", label: "Tipo" },
-    { k: "acft", label: "Acft" }, { k: "pn", label: "PN" }, { k: "desc", label: "Descrição", cls: "desc" },
-    { k: "qty", label: "Qtd", num: true, txt: qtyTxt },
-    { k: "nec", label: "Necessidade", txt: function(r){ return fd(r.nec); } },
-    { k: "prevDay", label: "Previsão", txt: prevText, val: function(r){ return r.prevDay != null ? r.prevDay : r.prevTxt; } },
-    { k: "atraso", label: "Atraso", num: true, val: atraso, txt: function(r){ var x = atraso(r); return x == null ? "" : x > 0 ? pl(x, "dia", "dias") : "no prazo"; }, cls: function(r){ var x = atraso(r); return "num" + (x != null && x > 0 ? " late" : ""); } },
-    { k: "st", label: "Status", html: stTag, csv: function(r){ return ST_LBL[r.st]; } },
-    { k: "resp", label: "Responsável" }, { k: "obs", label: "Observações", cls: "obs" }
-  ], rows, { key: "atraso", dir: -1 });
+  var hadOld = Object.keys(oldPend).length > 0;
+  Object.keys(oldPend).forEach(function(k){ if (pend[k] == null) { resolvidas++; tRes.push(t0 - oldPend[k]); } });
+  var avg = function(a){ return a.length ? a.reduce(function(s,x){ return s + x; }, 0) / a.length : null; };
 
-  var semPed = base.filter(function(r){ return r.st === "n" && !r.order; });
-  table("tSemPed", [
-    { k: "acft", label: "Acft" }, { k: "nec", label: "Necessidade", txt: function(r){ return fd(r.nec); } },
-    { k: "pn", label: "PN" }, { k: "desc", label: "Descrição", cls: "desc" }, { k: "qty", label: "Qtd", num: true, txt: qtyTxt },
-    { k: "prevDay", label: "Previsão", txt: prevText, val: function(r){ return r.prevDay != null ? r.prevDay : r.prevTxt; } },
-    { k: "resp", label: "Responsável" }, { k: "obs", label: "Observações", cls: "obs" }
-  ], semPed, { key: "nec", page: 50 });
-}
+  /* KPIs atuais */
+  var in60 = events.filter(function(e){ return e.days != null && e.days >= 0 && e.days <= 60; });
+  var ok60 = in60.filter(function(e){ return e.n === 0; }).length;
+  var nao60 = events.filter(function(e){ return e.days != null && e.days <= 60; }).reduce(function(s,e){ return s + e.n; }, 0);
+  var comPed = rows.filter(function(r){ return r.order; }), back = comPed.filter(isBack);
+  var fora = rows.filter(function(r){ return r.marco && r.marco.toUpperCase() !== "T180"; }).length;
 
-/* ---------- estoque ---------- */
-function renderEst(f){
-  $("estEmpty").classList.toggle("hidden", !!S.stock);
-  $("estDash").classList.toggle("hidden", !S.stock);
-  if (!S.stock) return;
-  var s = S.stock, pns = Object.keys(s.map).length, bases = Object.keys(s.byStation).length;
-  var nao = S.rows.filter(function(r){ return r.gone == null && r.st === "n" && match(r, f, false); });
-  var opp = nao.filter(function(r){ return stockTotal(r.pn) > 0; });
-  var transf = S.rows.filter(function(r){ return r.gone == null && r.prevTipo === "transferir" && match(r, f, false); }).length;
-  kpis("kEst", [
-    [fi(s.regs), "registros na posição"], [fi(pns), "PNs diferentes"], [fi(bases), "bases"],
-    [fd(s.dia), "data da posição"], [fi(opp.length), "não atendem com estoque em alguma base", "warn"], [fi(transf), "linhas aguardando transferência"]
-  ]);
-  bars("byStation", Object.keys(s.byStation).map(function(k){ return [k, s.byStation[k]]; }).sort(function(a,b){ return b[1]-a[1]; }).slice(0, 12), "var(--navy)");
-  renderPnQuery();
-  $("oppCount").textContent = S.rows.length ? pl(opp.length, "linha que não atende", "linhas que não atendem") + ", mas o PN tem estoque em alguma base." : "Carregue também a planilha de pré-indução para cruzar o estoque com as linhas que não atendem.";
-  table("tOpp", [
-    { k: "acft", label: "Acft" }, { k: "nec", label: "Necessidade", txt: function(r){ return fd(r.nec); } },
-    { k: "pn", label: "PN" }, { k: "desc", label: "Descrição", cls: "desc" }, { k: "qty", label: "Qtd necessária", num: true, txt: qtyTxt },
-    { k: "estTot", label: "Estoque total", num: true, val: function(r){ return stockTotal(r.pn); }, txt: function(r){ return fi(stockTotal(r.pn)); } },
-    { k: "estBases", label: "Onde está", cls: "stockcell", txt: function(r){ return stockTxt(r.pn); } },
-    { k: "resp", label: "Responsável" }, { k: "order", label: "Pedido" }
-  ], opp, { key: "nec" });
-}
-function renderPnQuery(){
-  var q = upn($("pnQuery").value);
-  if (!q) { $("pnResult").innerHTML = '<p class="empty">Digite um PN para ver em quais bases ele está.</p>'; return; }
-  var st = stockOf(q);
-  var dem = S.rows.filter(function(r){ return r.gone == null && upn(r.pn) === q; });
-  var dn = dem.filter(function(r){ return r.st === "n"; }).length;
-  var html = st ? "<p><b>" + esc(q) + "</b> " + esc(S.stock.desc[q] || "") + "</p>" + '<div class="hbars" id="pnBars"></div>' : '<p class="empty">O PN ' + esc(q) + " não aparece na posição de estoque carregada.</p>";
-  if (dem.length) html += '<p class="hint" style="margin-top:10px">Na pré-indução: ' + pl(dem.length, "linha ativa", "linhas ativas") + ", " + pl(dn, "não atende", "não atendem") + ".</p>";
-  $("pnResult").innerHTML = html;
-  if (st) bars("pnBars", st.map(function(x){ return [x[0], x[1]]; }), "var(--disp)");
-}
+  /* histórico Base_evolutivo */
+  var byWp = {};
+  be.forEach(function(x){ (byWp[x.wp] = byWp[x.wp] || []).push(x); });
+  var ind = [], t60h = [];
+  Object.keys(byWp).forEach(function(wp){
+    var xs = byWp[wp].sort(function(a,b){ return a.d - b.d; }), ini = xs[0].ini;
+    if (ini > t0) return;
+    var before = xs.filter(function(x){ return x.d <= ini && x.disp != null; });
+    if (before.length) { var l = before[before.length-1]; ind.push({ wp: wp, acft: l.acft, ini: ini, disp: l.disp, d: l.d }); }
+    var near = xs.filter(function(x){ var dd = ini - x.d; return dd >= 50 && dd <= 70; }).sort(function(a,b){ return Math.abs(ini - a.d - 60) - Math.abs(ini - b.d - 60); })[0];
+    if (near) { var at = near.at != null && near.tot ? near.at / near.tot : near.disp; if (at != null) t60h.push({ wp: wp, ini: ini, ok: at >= 0.999 }); }
+  });
+  ind.sort(function(a,b){ return a.ini - b.ini; });
+  var win = function(from, to){ return ind.filter(function(x){ return x.ini > t0 - from && x.ini <= t0 - to; }); };
+  var w1 = win(90, 0), w0 = win(180, 90);
+  var mdisp = function(a){ return a.length ? avg(a.map(function(x){ return x.disp * 100; })) : null; };
+  var hm = {};
+  ind.forEach(function(x){ var k = monthKey(x.ini); var m = hm[k] || (hm[k] = { n: 0, s: 0, n98: 0 }); m.n++; m.s += x.disp * 100; if (x.disp >= 0.98) m.n98++; });
+  var histMes = Object.keys(hm).sort().slice(-18).map(function(k){ return { m: k, n: hm[k].n, v: hm[k].s / hm[k].n, n98: hm[k].n98 }; });
+  var hq = {};
+  t60h.forEach(function(x){ var k = quarterKey(x.ini); var q = hq[k] || (hq[k] = { n: 0, ok: 0 }); q.n++; if (x.ok) q.ok++; });
+  var histT60 = Object.keys(hq).sort().slice(-8).map(function(k){ return { q: k, n: hq[k].n, ok: hq[k].ok }; });
 
-/* ================= histórico: cópia e restauração ================= */
-function exportHist(){
-  var data = { versao: 2, gerado: new Date().toISOString(), meta: S.meta, rows: S.rows.map(pack), cargas: S.cargas, stock: S.stock };
-  download(JSON.stringify(data), "historico-preinducao-" + new Date().toISOString().slice(0,10) + ".json", "application/json");
-}
-function importHist(file){
-  var rd = new FileReader();
-  rd.onload = function(){
-    try {
-      var d = JSON.parse(rd.result);
-      if (!d || d.versao !== 2 || !Array.isArray(d.rows)) throw new Error("Este arquivo não é uma cópia do histórico deste painel.");
-      if (!window.confirm("Substituir o histórico deste navegador pela cópia de " + (d.gerado ? new Date(d.gerado).toLocaleString("pt-BR") : "arquivo") + "?")) return;
-      S.meta = d.meta; S.rows = d.rows.map(unpack); S.cargas = d.cargas || []; S.stock = d.stock || null;
-      overlay("Restaurando…");
-      Promise.all([savePre(), S.stock ? saveStock() : dbDel("estoque")]).then(function(){ overlay(null); showDash(); });
-    } catch(e){ window.alert(e.message || String(e)); }
+  /* gargalos por área */
+  var resp = Object.keys(respAge).map(function(k){ return { r: k, n: respAge[k].n, idade: hadOld ? respAge[k].soma / respAge[k].n : null }; }).sort(function(a,b){ return b.n - a.n; });
+
+  /* pedidos */
+  var og = {};
+  back.forEach(function(r){
+    var o = og[r.order] || (og[r.order] = { o: r.order, ext: r.ext, tipo: r.tipo, linhas: 0, acft: {}, sem: r.prevTipo === "sem", atraso: null, nec: null });
+    o.linhas++; o.acft[r.acft] = 1;
+    if (r.prevDay != null && r.nec != null) { var x = r.prevDay - r.nec; if (o.atraso == null || x > o.atraso) o.atraso = x; }
+    if (r.nec != null && (o.nec == null || r.nec < o.nec)) o.nec = r.nec;
+  });
+  var orders = Object.keys(og).map(function(k){ var o = og[k]; o.nAcft = Object.keys(o.acft).length; o.acft = Object.keys(o.acft).slice(0, 6); return o; })
+    .sort(function(a,b){ return b.linhas - a.linhas || (b.atraso||0) - (a.atraso||0); }).slice(0, 10);
+
+  /* itens críticos x regularidade */
+  var pg = {};
+  rows.forEach(function(r){
+    if (r.st !== "n") return;
+    var p = pg[r.pn] || (pg[r.pn] = { pn: r.pn, desc: r.desc, linhas: 0, acft: {}, nec: null, semPed: 0 });
+    p.linhas++; p.acft[r.acft] = 1; if (!r.order) p.semPed++;
+    if (r.nec != null && (p.nec == null || r.nec < p.nec)) p.nec = r.nec;
+  });
+  var pnsAll = Object.keys(pg).map(function(k){ var p = pg[k], rg = reg[upn(p.pn)]; p.nAcft = Object.keys(p.acft).length; delete p.acft; p.reg = rg ? rg[0] : ""; p.cons = rg ? rg[1] : null; return p; })
+    .sort(function(a,b){ return b.linhas - a.linhas || (a.nec||0) - (b.nec||0); });
+  var pns = pnsAll.slice(0, 10);
+
+  /* fornecedores (1328) ligados à pré-indução */
+  var ordSet = {}; rows.forEach(function(r){ if (r.order) ordSet[upn(r.order)] = 1; });
+  var vg = {}, abertos = 0, vencidos = 0;
+  ord.forEach(function(x){
+    if (!ordSet[x.o]) return;
+    if (["CLOSED","RECEIVED","CANCELLED"].indexOf(x.st) >= 0) return;
+    abertos++;
+    if (x.due != null && x.due < t0) {
+      vencidos++;
+      var nm = x.name || "Sem fornecedor"; if (norm(nm) === "req. spot") nm = "Requisição sem fornecedor (REQ. SPOT)";
+      vg[nm] = (vg[nm] || 0) + 1;
+    }
+  });
+  var vend = Object.keys(vg).map(function(k){ return { name: k, n: vg[k] }; }).sort(function(a,b){ return b.n - a.n; }).slice(0, 8);
+
+  /* pontos de ação */
+  var acts = [];
+  in60.concat(events.filter(function(e){ return e.days != null && e.days < 0; })).forEach(function(e){
+    if (!e.n) return;
+    var rs = Object.keys(e.resp).sort(function(a,b){ return e.resp[b] - e.resp[a]; }).slice(0, 3).map(function(k){ return k.replace(/^\d+-/, "") + " " + e.resp[k]; }).join(", ");
+    acts.push({ sev: e.days <= 30 || e.n >= 50 ? "alta" : "media", ord: e.days, area: "Pré-indução",
+      t: e.acft + (e.days < 0 ? " em execução" : " entra em " + fd(e.prog, true) + " (" + marcoAtual(e.days) + ")") + " com " + pl(e.n, "linha sem atendimento", "linhas sem atendimento"),
+      d: "Atendido: " + Math.round(pct(e.d + e.a, e.t)) + "%. Pendências por área: " + rs + "." });
+  });
+  events.forEach(function(e){
+    if (e.days != null && e.days >= 0 && e.days <= 10 && e.transf > 0)
+      acts.push({ sev: "alta", ord: e.days - 0.5, area: "Manutenção", t: "Pedir reserva e transferência de " + pl(e.transf, "linha", "linhas") + " para " + e.acft, d: "Indução em " + fd(e.prog, true) + ". Pela regra do manual, a transferência deve ser solicitada ao AOGDESK entre T-7 e T-3." });
+  });
+  orders.slice(0, 4).forEach(function(o){
+    if (o.linhas < 5) return;
+    acts.push({ sev: o.nec != null && o.nec - t0 <= 60 ? "alta" : "media", ord: 100 + (o.nec != null ? o.nec - t0 : 999), area: "Compras",
+      t: o.tipo + " " + o.o + (o.sem ? " sem previsão" : " atrasado " + pl(o.atraso, "dia", "dias")) + " trava " + pl(o.linhas, "linha", "linhas"),
+      d: "Afeta " + pl(o.nAcft, "aeronave", "aeronaves") + " (" + o.acft.join(", ") + (o.nAcft > o.acft.length ? "…" : "") + "). Primeira necessidade em " + fd(o.nec) + "." });
+  });
+  pnsAll.filter(function(p){ return norm(p.reg) === "regular" && p.nAcft >= 2; }).slice(0, 3).forEach(function(p){
+    acts.push({ sev: "media", ord: 300, area: "Planejamento", t: "Revisar estoque mínimo de " + p.pn + " (" + p.desc + ")", d: "Consumo regular e falta em " + pl(p.nAcft, "aeronave", "aeronaves") + " (" + pl(p.linhas, "linha", "linhas") + ")." });
+  });
+  var semPedPerto = rows.filter(function(r){ return r.st === "n" && !r.order && r.nec != null && r.nec - t0 <= 45; });
+  if (semPedPerto.length) acts.push({ sev: "alta", ord: 50, area: "Planejamento", t: pl(semPedPerto.length, "linha sem pedido", "linhas sem pedido") + " com necessidade nos próximos 45 dias", d: "Não atendem e ainda não têm PO, requisição, reparo ou ordem de produção." });
+  events.forEach(function(e){
+    if (e.days != null && e.days >= 0 && e.days <= 120 && e.t >= 100 && e.fora / e.t > 0.3)
+      acts.push({ sev: "media", ord: 400 + e.days, area: "Planej. Manutenção", t: Math.round(pct(e.fora, e.t)) + "% da demanda de " + e.acft + " entrou depois do T-180", d: "Alinhar com o Planejamento de Manutenção a liberação antecipada do pacote " + e.p + "." });
+  });
+  if (vend.length && vend[0].n >= 10) acts.push({ sev: "media", ord: 500, area: "Compras", t: vend[0].name + " com " + pl(vend[0].n, "item vencido", "itens vencidos"), d: "Itens de pedidos que abastecem a pré-indução, com data confirmada ou target já ultrapassada." });
+  acts.sort(function(a,b){ return (a.sev === b.sev ? 0 : a.sev === "alta" ? -1 : 1) || a.ord - b.ord; });
+
+  var kpi = {
+    dispInd: { v: mdisp(w1), n: w1.length, n98: w1.filter(function(x){ return x.disp >= 0.98; }).length, prev: mdisp(w0) },
+    t60: { ok: ok60, n: in60.length },
+    nao60: nao60,
+    back: { n: back.length, base: comPed.length },
+    fora: { n: fora, base: rows.length },
+    idade: hadOld ? avg(idades) : null,
+    res: { n: hadOld ? resolvidas : null, t: avg(tRes) },
+    venc: { n: vencidos, base: abertos }
   };
-  rd.readAsText(file);
+  var snap = { v: 1, ts: Date.now(), dia: t0, arquivo: file, linhas: rows.length, kpi: kpi, events: events, actions: acts.slice(0, 30),
+    histMes: histMes, histT60: histT60, inducoes: ind.slice(-12).reverse(), resp: resp, orders: orders, pns: pns, vend: vend, beN: be.length };
+  return { snap: snap, pend: pend };
 }
-function clearAll(){
-  if (!window.confirm("Apagar todo o histórico e a posição de estoque guardados neste navegador? Baixe uma cópia antes, se ainda precisar.")) return;
-  Promise.all([dbDel("pre"), dbDel("estoque")]).then(function(){ S.rows = []; S.cargas = []; S.meta = null; S.stock = null; showDash(); });
+function resumoOf(s){
+  var k = s.kpi;
+  return { ts: s.ts, dia: s.dia, arquivo: s.arquivo, dispInd: k.dispInd.v, t60: k.t60.n ? pct(k.t60.ok, k.t60.n) : null, nao60: k.nao60,
+    back: k.back.base ? pct(k.back.n, k.back.base) : null, fora: k.fora.base ? pct(k.fora.n, k.fora.base) : null, idade: k.idade };
 }
 
-/* ================= eventos ================= */
-function setTab(t){ S.tab = ["visao","preinducao","pedidos","estoque"].indexOf(t) >= 0 ? t : "visao"; render(); }
-window.addEventListener("hashchange", function(){ setTab(location.hash.slice(1)); });
+/* ================= armazenamento ================= */
+function sleep(ms){ return new Promise(function(r){ setTimeout(r, ms); }); }
+function retry(fn){ var n = 0; return (function go(){ return fn().catch(function(e){ n++; if (n < 4 && e && (e.code === "unavailable" || e.code === "resource_exhausted")) return sleep(700 * n).then(go); throw e; }); })(); }
+function cloudStore(db){
+  return { kind: "cloud",
+    load: function(){
+      return retry(function(){ return db.doc("estado/atual").get(); }).then(function(s){
+        if (!s.exists) return { snap: null, resumos: [], pend: {}, id: null };
+        var id = s.data().snapId;
+        return Promise.all([
+          retry(function(){ return db.doc("snaps/" + id).get(); }),
+          retry(function(){ return db.doc("pend/atual").get(); }),
+          retry(function(){ return db.collection("resumos").orderBy("ts","desc").limit(60).get(); })
+        ]).then(function(v){
+          return { snap: v[0].exists ? v[0].data() : null, pend: v[1].exists ? (v[1].data().map || {}) : {}, resumos: v[2].docs.map(function(d){ return d.data(); }).reverse(), id: id };
+        });
+      });
+    },
+    save: function(snap, pend){
+      var id = "s" + snap.ts;
+      return retry(function(){ return db.doc("snaps/" + id).set(snap); })
+        .then(function(){ return retry(function(){ return db.doc("pend/atual").set({ map: pend, ts: snap.ts }); }); })
+        .then(function(){ return retry(function(){ return db.doc("resumos/" + id).set(resumoOf(snap)); }); })
+        .then(function(){ return retry(function(){ return db.doc("estado/atual").set({ snapId: id, ts: snap.ts, arquivo: snap.arquivo }); }); })
+        .then(function(){
+          return db.collection("snaps").orderBy("ts","desc").limit(40).get().then(function(q){
+            return q.docs.slice(12).reduce(function(p, d){ return p.then(function(){ return db.doc("snaps/" + d.id).delete(); }); }, Promise.resolve());
+          }).catch(function(){});
+        }).then(function(){ return id; });
+    },
+    watch: function(cb){ return db.doc("estado/atual").onSnapshot(function(s){ cb(s.exists ? s.data().snapId : null); }, function(){}); }
+  };
+}
+function localStore(){
+  function open(){ return new Promise(function(res, rej){ try { var rq = indexedDB.open("preinducao-gerencial", 1); rq.onupgradeneeded = function(){ rq.result.createObjectStore("s"); }; rq.onsuccess = function(){ res(rq.result); }; rq.onerror = function(){ rej(rq.error); }; } catch(e){ rej(e); } }); }
+  function get(){ return open().then(function(db){ return new Promise(function(res){ try { var rq = db.transaction("s").objectStore("s").get("estado"); rq.onsuccess = function(){ res(rq.result || null); }; rq.onerror = function(){ res(null); }; } catch(e){ res(null); } }); }).catch(function(){ return null; }); }
+  return { kind: "local",
+    load: function(){ return get().then(function(v){ return v || { snap: null, resumos: [], pend: {}, id: null }; }); },
+    save: function(snap, pend){
+      return get().then(function(v){
+        var resumos = ((v && v.resumos) || []).concat([resumoOf(snap)]).slice(-60), id = "s" + snap.ts;
+        return open().then(function(db){ return new Promise(function(res, rej){ var tx = db.transaction("s","readwrite"); tx.objectStore("s").put({ snap: snap, pend: pend, resumos: resumos, id: id }, "estado"); tx.oncomplete = function(){ res(id); }; tx.onerror = function(){ rej(tx.error); }; }); });
+      });
+    },
+    watch: function(){}
+  };
+}
+function initStore(){
+  var c = window.claude;
+  if (!c || typeof c.use !== "function") return Promise.resolve(localStore());
+  return c.use("db").then(function(db){ return db ? cloudStore(db) : localStore(); }).catch(function(){ return localStore(); });
+}
+
+/* ================= carregar planilha ================= */
+function overlay(msg){ if (msg) { $("overlayMsg").textContent = msg; $("overlay").classList.add("on"); } else $("overlay").classList.remove("on"); }
+function fail(msg){ overlay(null); if (S.snap) window.alert(msg); else { $("emptyMsg").className = "msg err"; $("emptyMsg").textContent = msg; } }
+function handleFile(file){
+  if (!file) return;
+  if (!store) { fail("O painel ainda está carregando. Tente de novo em alguns segundos."); return; }
+  if (typeof XLSX === "undefined") { fail("A biblioteca que lê o Excel não carregou. Confira a conexão e recarregue a página."); return; }
+  overlay("Lendo “" + file.name + "”. Pode levar até 1 minuto…");
+  var rd = new FileReader();
+  rd.onerror = function(){ fail("Não foi possível ler o arquivo."); };
+  rd.onload = function(e){
+    setTimeout(function(){
+      var res;
+      try {
+        var wb = XLSX.read(new Uint8Array(e.target.result), { type: "array", sheets: ["Caminho Crítico","Base_evolutivo","Regularidade","1328 AMOS"], sheetRows: 60000, dense: true, cellDates: false, cellFormula: false, cellHTML: false, cellText: false, cellStyles: false });
+        if (!findSheet(wb, "Caminho Crítico")) throw new Error("Este arquivo não tem a aba Caminho Crítico. Use a planilha de pré-indução da semana.");
+        overlay("Calculando indicadores…");
+        var rows = readCC(aoaOf(wb, "Caminho Crítico"));
+        var be = readBE(aoaOf(wb, "Base_evolutivo")), reg = readReg(aoaOf(wb, "Regularidade")), ord = read1328(aoaOf(wb, "1328 AMOS"));
+        wb = null;
+        res = build(rows, be, reg, ord, S.pend || {}, file.name);
+      } catch(err) { fail(err.message || String(err)); return; }
+      overlay("Salvando…");
+      store.save(res.snap, res.pend).then(function(id){
+        S.resumos = S.resumos.filter(function(x){ return x.ts !== res.snap.ts; }).concat([resumoOf(res.snap)]);
+        S.snap = res.snap; S.pend = res.pend; S.snapId = id; overlay(null); render();
+      }).catch(function(e){
+        var c = e && e.code;
+        fail(c === "invalid_argument" || c === "not_granted" ? "Você pode ver o painel, mas não tem permissão para atualizá-lo. Peça ao dono acesso de colaborador ou editor." : "A atualização não foi salva (" + ((e && (e.message || e.code)) || "erro") + "). Tente de novo.");
+      });
+    }, 60);
+  };
+  rd.readAsArrayBuffer(file);
+}
+
+/* ================= desenho ================= */
+function deltaHtml(cur, prev, higherBetter, unit, digits){
+  if (cur == null || prev == null) return '<div class="delta eq">Sem comparação ainda</div>';
+  var d = cur - prev, eps = digits ? 0.05 : 0.5;
+  if (Math.abs(d) < eps) return '<div class="delta eq">Estável em relação à atualização anterior</div>';
+  var good = higherBetter ? d > 0 : d < 0;
+  var val = digits ? f1(Math.abs(d)) : fi(Math.round(Math.abs(d)));
+  return '<div class="delta ' + (good ? "up" : "down") + '">' + (d > 0 ? "▲ " : "▼ ") + val + (unit || "") + " vs. atualização anterior</div>";
+}
+function cls(v, good, warn, higherBetter){ if (v == null) return ""; return higherBetter ? (v >= good ? "good" : v >= warn ? "warn" : "bad") : (v <= good ? "good" : v <= warn ? "warn" : "bad"); }
+function renderKpis(){
+  var k = S.snap.kpi, prev = S.resumos.length > 1 ? S.resumos[S.resumos.length-2] : null, cur = resumoOf(S.snap);
+  var t60 = k.t60.n ? pct(k.t60.ok, k.t60.n) : null, back = k.back.base ? pct(k.back.n, k.back.base) : null, fora = k.fora.base ? pct(k.fora.n, k.fora.base) : null;
+  var cards = [
+    { h: "Disponibilidade na indução", v: k.dispInd.v != null ? f1(k.dispInd.v) + "%" : "–", c: cls(k.dispInd.v, 98, 95, true), meta: "Meta: 98% ou mais",
+      ctx: k.dispInd.n ? "Média das " + pl(k.dispInd.n, "indução", "induções") + " dos últimos 90 dias; " + k.dispInd.n98 + " atingiram 98%." : "Sem induções nos últimos 90 dias na Base_evolutivo.",
+      dl: k.dispInd.prev != null && k.dispInd.v != null ? deltaHtml(k.dispInd.v, k.dispInd.prev, true, " p.p.", 1).replace("vs. atualização anterior", "vs. 90 dias anteriores") : '<div class="delta eq">Sem comparação ainda</div>' },
+    { h: "Aderência ao T-60", v: t60 != null ? Math.round(t60) + "%" : "–", c: cls(t60, 100, 80, true), meta: "Meta: 100%",
+      ctx: k.t60.n ? k.t60.ok + " de " + pl(k.t60.n, "aeronave", "aeronaves") + " a até 60 dias da indução estão 100% atendidas." : "Nenhuma indução nos próximos 60 dias.", dl: deltaHtml(cur.t60, prev && prev.t60, true, " p.p.", 1) },
+    { h: "Linhas sem atendimento até T-60", v: fi(k.nao60), c: cls(k.nao60, 0, 50, false), meta: "Meta: zero",
+      ctx: "Inclui aeronaves em execução e as que entram nos próximos 60 dias.", dl: deltaHtml(cur.nao60, prev && prev.nao60, false, "", 0) },
+    { h: "Pedidos em backorder", v: back != null ? f1(back) + "%" : "–", c: cls(back, 5, 15, false), meta: "Referência: até 5%",
+      ctx: fi(k.back.n) + " de " + fi(k.back.base) + " linhas com pedido estão atrasadas ou sem previsão.", dl: deltaHtml(cur.back, prev && prev.back, false, " p.p.", 1) },
+    { h: "Demanda fora do marco", v: fora != null ? f1(fora) + "%" : "–", c: cls(fora, 15, 25, false), meta: "Referência: até 15%",
+      ctx: fi(k.fora.n) + " linhas entraram depois do T-180. Depende do Planejamento de Manutenção.", dl: deltaHtml(cur.fora, prev && prev.fora, false, " p.p.", 1) }
+  ];
+  $("kcards").innerHTML = cards.map(function(c){ return '<div class="kcard ' + c.c + '"><h4>' + c.h + '</h4><div class="v">' + c.v + '</div><div class="meta">' + c.meta + "</div>" + c.dl + '<div class="ctx">' + c.ctx + "</div></div>"; }).join("");
+}
+function renderActions(){
+  var acts = S.snap.actions, areas = {};
+  acts.forEach(function(a){ areas[a.area] = (areas[a.area] || 0) + 1; });
+  if (S.actArea && !areas[S.actArea]) S.actArea = "";
+  $("actFilter").innerHTML = '<button type="button" class="chip" data-area="" aria-pressed="' + !S.actArea + '">Todas (' + acts.length + ")</button>" +
+    Object.keys(areas).map(function(k){ return '<button type="button" class="chip" data-area="' + esc(k) + '" aria-pressed="' + (S.actArea === k) + '">' + esc(k) + " (" + areas[k] + ")</button>"; }).join("");
+  var list = acts.filter(function(a){ return !S.actArea || a.area === S.actArea; });
+  $("actions").innerHTML = list.length ? list.map(function(a){ return '<div class="act ' + a.sev + '"><span class="sev" title="' + (a.sev === "alta" ? "Prioridade alta" : "Prioridade média") + '"></span><div><b>' + esc(a.t) + '</b><span class="d">' + esc(a.d) + '</span></div><span class="area">' + esc(a.area) + "</span></div>"; }).join("")
+    : '<p class="empty">Nenhum ponto de ação: as induções dos próximos 60 dias estão atendidas e não há pedidos críticos.</p>';
+}
+function renderTimeline(){
+  var t0 = today(), MAX = 180, x = function(d){ return Math.max(0, Math.min(MAX, d)) / MAX * 100; };
+  var evs = S.snap.events.map(function(e){ var c = {}; Object.keys(e).forEach(function(k){ c[k] = e[k]; }); c.days = e.prog != null ? e.prog - t0 : null; return c; })
+    .filter(function(e){ return e.days == null || e.days >= -45; });
+  var marks = [[0,"Hoje"],[60,"T-60"],[120,"T-120"],[180,"T-180"]];
+  var scale = marks.map(function(m){ return '<span style="left:' + x(m[0]) + '%"><b>' + m[1] + "</b>" + fd(t0 + m[0], true) + "</span>"; }).join("");
+  var guides = '<span class="zone" style="width:' + x(60) + '%"></span>' + [7,45,60,120,180].map(function(d){ return '<i style="left:' + x(d) + '%"></i>'; }).join("");
+  $("timeline").innerHTML = evs.length ? '<div class="tl-axis"><span>Aeronave</span><div class="tl-scale">' + scale + '</div><span style="text-align:right">Pend.</span></div><div class="tl-body"><div class="tl-guides">' + guides + "</div>" +
+    evs.map(function(e){
+      var at = Math.round(pct(e.d + e.a, e.t)), c = e.n === 0 ? "ok" : (e.days != null && e.days <= 60 ? "bad" : "mid");
+      var when = e.days == null ? "sem data" : e.days < 0 ? "em execução" : e.days === 0 ? "hoje" : "em " + pl(e.days, "dia", "dias");
+      return '<div class="tl-row" style="cursor:default" title="' + esc(e.acft + ", " + e.ativ + ", " + e.t + " linhas, " + e.n + " sem atendimento") + '"><span class="tl-name">' + esc(e.acft) + "<small>" + fd(e.prog, true) + ", " + when + '</small></span><span class="tl-track"><span class="tl-pill ' + c + (e.days != null && e.days < 0 ? " past" : "") + '" style="left:' + x(e.days == null ? MAX : e.days) + '%">' + at + '%</span></span><span class="tl-pct" style="color:' + (e.n ? "var(--nao)" : "var(--disp)") + '">' + (e.n ? fi(e.n) : "✓") + "</span></div>";
+    }).join("") + "</div>" : '<p class="empty">Nenhuma indução programada.</p>';
+}
+function barChart(id, items, opts){
+  var W = 600, H = 220, L = 34, R = 8, T = 18, B = 34, svg = $(id);
+  if (!items.length) { svg.innerHTML = '<text x="300" y="110" text-anchor="middle">' + opts.empty + "</text>"; return; }
+  var mn = opts.min, mx = opts.max, n = items.length, bw = (W - L - R) / n;
+  var y = function(v){ return T + (1 - (Math.max(mn, Math.min(mx, v)) - mn) / (mx - mn)) * (H - T - B); };
+  var out = "";
+  opts.ticks.forEach(function(t){ out += '<line class="grid" x1="' + L + '" x2="' + (W - R) + '" y1="' + y(t) + '" y2="' + y(t) + '"/><text x="' + (L - 6) + '" y="' + (y(t) + 4) + '" text-anchor="end">' + t + "%</text>"; });
+  items.forEach(function(it, i){
+    var x0 = L + i * bw + bw * 0.18, w = bw * 0.64, yv = y(it.v), color = it.v >= opts.meta ? "var(--disp)" : it.v >= opts.warn ? "var(--atende)" : "var(--nao)";
+    out += '<rect x="' + x0.toFixed(1) + '" y="' + yv.toFixed(1) + '" width="' + w.toFixed(1) + '" height="' + (H - B - yv).toFixed(1) + '" rx="2" fill="' + color + '"><title>' + esc(it.title) + "</title></rect>";
+    if (n <= 18) out += '<text class="lbl" x="' + (x0 + w/2).toFixed(1) + '" y="' + (yv - 4).toFixed(1) + '" text-anchor="middle">' + Math.round(it.v) + "</text>";
+    out += '<text x="' + (x0 + w/2).toFixed(1) + '" y="' + (H - B + 15) + '" text-anchor="middle">' + it.lbl + "</text>";
+    out += '<text x="' + (x0 + w/2).toFixed(1) + '" y="' + (H - B + 28) + '" text-anchor="middle">' + it.sub + "</text>";
+  });
+  out += '<line class="meta-line" x1="' + L + '" x2="' + (W - R) + '" y1="' + y(opts.meta) + '" y2="' + y(opts.meta) + '"/>';
+  svg.innerHTML = out;
+}
+function renderCharts(){
+  barChart("chMes", S.snap.histMes.map(function(m, i){ return { v: m.v, lbl: MES[parseInt(m.m.split("-")[1],10)-1], sub: (i === 0 || m.m.slice(5) === "01") ? m.m.slice(0,4) : "", title: monthLbl(m.m) + ": " + f1(m.v) + "% em " + pl(m.n, "indução", "induções") + ", " + m.n98 + " com 98% ou mais" }; }),
+    { min: 80, max: 100, ticks: [80, 85, 90, 95, 100], meta: 98, warn: 95, empty: "A aba Base_evolutivo não foi encontrada ou não tem induções passadas." });
+  barChart("chT60", S.snap.histT60.map(function(q){ var v = pct(q.ok, q.n); return { v: v, lbl: q.q.replace("T", " T"), sub: q.ok + " de " + q.n, title: q.q + ": " + q.ok + " de " + pl(q.n, "aeronave", "aeronaves") + " 100% atendidas no T-60" }; }),
+    { min: 0, max: 100, ticks: [0, 25, 50, 75, 100], meta: 100, warn: 80, empty: "Sem histórico de T-60 na Base_evolutivo." });
+}
+function tableHtml(head, rows){ return '<div class="scroll"><table><thead><tr>' + head.map(function(h){ return "<th" + (h[1] ? ' class="num"' : "") + ">" + h[0] + "</th>"; }).join("") + "</tr></thead><tbody>" + rows.join("") + "</tbody></table></div>"; }
+function renderTables(){
+  var s = S.snap, max = s.resp.reduce(function(m,x){ return Math.max(m, x.n); }, 0);
+  $("resp").innerHTML = s.resp.length ? '<div class="hbars">' + s.resp.map(function(r){ return '<div class="hb"><span>' + esc(r.r) + '</span><span class="track"><span style="width:' + pct(r.n, max) + '%;background:var(--nao)"></span></span><b>' + fi(r.n) + '</b></div>' + (r.idade != null ? '<div class="who" style="margin:-5px 0 4px 0">Pendentes há ' + pl(Math.round(r.idade), "dia", "dias") + ' em média</div>' : ""); }).join("") + "</div>" + (s.resp.length && s.resp[0].idade == null ? '<p class="who" style="margin-top:10px">O tempo médio de pendência por área aparece a partir da segunda atualização.</p>' : "") : '<p class="empty">Nenhuma linha sem atendimento.</p>';
+  $("orders").innerHTML = s.orders.length ? tableHtml([["Pedido"],["Tipo"],["Linhas",1],["Acft",1],["Situação"]], s.orders.map(function(o){ return "<tr><td>" + esc(o.o) + (o.ext ? '<div class="who">' + esc(o.ext) + "</div>" : "") + "</td><td>" + esc(o.tipo) + '</td><td class="num">' + fi(o.linhas) + '</td><td class="num">' + o.nAcft + "</td><td" + (o.sem ? "" : ' class="late"') + ">" + (o.sem ? "Sem previsão" : "Atraso de " + pl(o.atraso, "dia", "dias")) + "</td></tr>"; }))
+    : '<p class="empty">Nenhum pedido em backorder.</p>';
+  $("pns").innerHTML = s.pns.length ? tableHtml([["PN"],["Descrição"],["Linhas",1],["Acft",1],["Perfil"],["Cons./mês",1]], s.pns.map(function(p){ return "<tr><td>" + esc(p.pn) + '</td><td class="desc">' + esc(p.desc) + '</td><td class="num">' + fi(p.linhas) + '</td><td class="num">' + p.nAcft + '</td><td><span class="reg ' + esc(p.reg) + '">' + esc(p.reg || "Sem classificação") + '</span></td><td class="num">' + (p.cons != null ? fi(Math.round(p.cons)) : "") + "</td></tr>"; }))
+    : '<p class="empty">Nenhum item crítico.</p>';
+  var vmax = s.vend.reduce(function(m,x){ return Math.max(m, x.n); }, 0);
+  $("vend").innerHTML = s.vend.length ? s.vend.map(function(v){ return '<div class="hb" style="grid-template-columns:minmax(120px,230px) minmax(0,1fr) 50px"><span title="' + esc(v.name) + '">' + esc(v.name) + '</span><span class="track"><span style="width:' + pct(v.n, vmax) + '%;background:var(--atende)"></span></span><b>' + fi(v.n) + "</b></div>"; }).join("") +
+    '<p class="who" style="margin-top:10px">' + fi(s.kpi.venc.n) + " de " + fi(s.kpi.venc.base) + " itens abertos desses pedidos estão vencidos.</p>"
+    : '<p class="empty">' + (s.kpi.venc.base ? "Nenhum item vencido." : "A aba 1328 AMOS não foi encontrada na planilha.") + "</p>";
+  $("inducoes").innerHTML = s.inducoes.length ? tableHtml([["Aeronave"],["Pacote"],["Entrada"],["Disponível na véspera",1],["Situação"]], s.inducoes.map(function(x){ var v = x.disp * 100; return "<tr><td>" + esc(x.acft) + "</td><td>" + esc(x.wp) + "</td><td>" + fd(x.ini) + '</td><td class="num">' + f1(v) + '%</td><td><span class="tag ' + (v >= 99.95 ? "disp" : v >= 98 ? "atende" : "nao") + '">' + (v >= 99.95 ? "100%" : v >= 98 ? "Dentro da meta" : "Abaixo da meta") + "</span></td></tr>"; }))
+    : '<p class="empty">Sem induções registradas na Base_evolutivo.</p>';
+}
+function render(){
+  var has = !!S.snap;
+  $("empty").classList.toggle("hidden", has); $("dash").classList.toggle("hidden", !has);
+  if (!has) return;
+  var s = S.snap;
+  $("subInfo").textContent = "Atualizado em " + new Date(s.ts).toLocaleString("pt-BR") + " com " + s.arquivo;
+  renderKpis(); renderActions(); renderTimeline(); renderCharts(); renderTables();
+  $("note").textContent = "Base: " + fi(s.linhas) + " linhas do Caminho Crítico e " + fi(s.beN) + " registros da Base_evolutivo. " + pl(S.resumos.length, "atualização salva", "atualizações salvas") + " no histórico do painel.";
+}
+
+/* ================= início e eventos ================= */
+function loadAll(){
+  overlay("Carregando painel…");
+  return store.load().then(function(d){ S.snap = d.snap; S.pend = d.pend || {}; S.resumos = d.resumos || []; S.snapId = d.id; $("newBanner").classList.add("hidden"); overlay(null); render(); })
+    .catch(function(e){ overlay(null); fail("Não foi possível carregar os dados salvos (" + ((e && (e.message || e.code)) || "erro") + "). Recarregue a página."); });
+}
+initStore().then(function(s){
+  store = s;
+  var b = $("storeBadge");
+  if (s.kind === "cloud") { b.textContent = "Dados compartilhados com a equipe"; b.classList.add("cloud"); }
+  else { b.textContent = "Dados só neste navegador"; $("localBanner").classList.remove("hidden"); }
+  loadAll().then(function(){ var first = true; s.watch(function(id){ if (first) { first = false; return; } if (id && id !== S.snapId) $("newBanner").classList.remove("hidden"); }); });
+});
 $("loadBtn").addEventListener("click", function(){ $("fileInput").click(); });
-$("fileInput").addEventListener("change", function(e){ handleFiles(e.target.files); e.target.value = ""; });
-document.addEventListener("click", function(e){
-  if (e.target.closest(".drop")) { $("fileInput").click(); return; }
-  var ev = e.target.closest("[data-ev]");
-  if (ev) { var p = ev.getAttribute("data-ev"); $("fEvento").value = $("fEvento").value === p ? "" : p; resetPages(); render(); return; }
-  var pn = e.target.closest("tr[data-pn]");
-  if (pn) { $("fBusca").value = pn.getAttribute("data-pn"); location.hash = "preinducao"; resetPages(); setTab("preinducao"); return; }
-  var q = e.target.closest("tr[data-q]");
-  if (q) { $("fBusca").value = q.getAttribute("data-q"); $("fSit").value = ""; resetPages(); render(); return; }
-  var csv = e.target.closest("[data-csv]");
-  if (csv) { exportCsv(csv.getAttribute("data-csv")); return; }
-  if (!e.target.closest(".menu")) closeMenu();
-});
-document.addEventListener("keydown", function(e){
-  if ((e.key === "Enter" || e.key === " ") && e.target.classList && e.target.classList.contains("drop")) { e.preventDefault(); $("fileInput").click(); }
-  if (e.key === "Escape") { if ($("confirm").classList.contains("on")) { pending = null; closeConfirm(); nextFile(); } closeMenu(); }
-});
-["dragenter","dragover"].forEach(function(t){ document.addEventListener(t, function(e){ e.preventDefault(); document.querySelectorAll(".drop").forEach(function(d){ d.classList.add("over"); }); }); });
-["dragleave","drop"].forEach(function(t){ document.addEventListener(t, function(e){ e.preventDefault(); document.querySelectorAll(".drop").forEach(function(d){ d.classList.remove("over"); }); }); });
-document.addEventListener("drop", function(e){ if (e.dataTransfer && e.dataTransfer.files.length) handleFiles(e.dataTransfer.files); });
-$("cfCancel").addEventListener("click", function(){ pending = null; closeConfirm(); nextFile(); });
-$("cfSave").addEventListener("click", saveCarga);
-function resetPages(){ Object.keys(TB).forEach(function(k){ TB[k].page = 0; }); }
-["fEvento","fResp","fAtiv","fStatus","fMarco","fMud","fSit","fTipo"].forEach(function(id){ $(id).addEventListener("change", function(){ resetPages(); render(); }); });
-var tmr; $("fBusca").addEventListener("input", function(){ clearTimeout(tmr); tmr = setTimeout(function(){ resetPages(); render(); }, 220); });
-var tmr2; $("pnQuery").addEventListener("input", function(){ clearTimeout(tmr2); tmr2 = setTimeout(renderPnQuery, 200); });
-$("resetBtn").addEventListener("click", function(){ ["fEvento","fResp","fAtiv"].forEach(function(id){ $(id).value = ""; }); $("fBusca").value = ""; resetPages(); render(); });
-["tPre","tPed","tSemPed","tOpp"].forEach(wireTable);
-function closeMenu(){ $("menuList").classList.add("hidden"); $("menuBtn").setAttribute("aria-expanded","false"); }
-$("menuBtn").addEventListener("click", function(e){ e.stopPropagation(); var open = $("menuList").classList.toggle("hidden") === false; $("menuBtn").setAttribute("aria-expanded", String(open)); });
-$("exportBtn").addEventListener("click", function(){ closeMenu(); exportHist(); });
-$("importBtn").addEventListener("click", function(){ closeMenu(); $("importInput").click(); });
-$("importInput").addEventListener("change", function(e){ if (e.target.files[0]) importHist(e.target.files[0]); e.target.value = ""; });
-$("clearBtn").addEventListener("click", function(){ closeMenu(); clearAll(); });
+$("empty").addEventListener("click", function(){ $("fileInput").click(); });
+$("empty").addEventListener("keydown", function(e){ if (e.key === "Enter" || e.key === " ") { e.preventDefault(); $("fileInput").click(); } });
+$("fileInput").addEventListener("change", function(e){ handleFile(e.target.files[0]); e.target.value = ""; });
+["dragenter","dragover"].forEach(function(t){ document.addEventListener(t, function(e){ e.preventDefault(); $("empty").classList.add("over"); }); });
+["dragleave","drop"].forEach(function(t){ document.addEventListener(t, function(e){ e.preventDefault(); $("empty").classList.remove("over"); }); });
+document.addEventListener("drop", function(e){ var f = e.dataTransfer && e.dataTransfer.files[0]; if (f) handleFile(f); });
+$("reloadBtn").addEventListener("click", loadAll);
+$("actFilter").addEventListener("click", function(e){ var c = e.target.closest("[data-area]"); if (c) { S.actArea = c.getAttribute("data-area"); renderActions(); } });
 $("themeBtn").addEventListener("click", function(){
   var cur = document.documentElement.getAttribute("data-theme");
   var dark = cur ? cur === "dark" : window.matchMedia("(prefers-color-scheme: dark)").matches;
@@ -1120,15 +838,7 @@ $("themeBtn").addEventListener("click", function(){
   try { localStorage.setItem("preinducao-tema", next); } catch(e){}
 });
 try { var th = localStorage.getItem("preinducao-tema"); if (th) document.documentElement.setAttribute("data-theme", th); } catch(e){}
-
-/* ================= início ================= */
-S.tab = ["visao","preinducao","pedidos","estoque"].indexOf(location.hash.slice(1)) >= 0 ? location.hash.slice(1) : "visao";
-Promise.all([dbGet("pre"), dbGet("estoque")]).then(function(v){
-  if (v[0] && v[0].rows) { S.meta = v[0].meta; S.rows = v[0].rows.map(unpack); S.cargas = v[0].cargas || []; }
-  if (v[1]) S.stock = v[1];
-  showDash();
-});
-window.__pi = { S: S, merge: merge };
+window.__pg = { S: S, build: build };
 })();
 
 </script>
